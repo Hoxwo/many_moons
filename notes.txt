@@ -1,0 +1,92 @@
+
+--Civilization Stats - max of 10
+    --ATK - Provides better chance of victory during dice rolls for attacks
+    --DEF - Provides better chance of defending during dice rolls when attacked + defense satellites graphics
+    --NAV - Navigation level affects range from base planet that can be travelled to
+    --GOV - Government level affects chance of revolt and colonization time; base planet will never revolt
+    --TEC - Technology level affects speed of ships and time between ship availability, number ships available
+    --RES - Affects colonization time, ship speed, time for available ship - Can only be gained by colonizing more planets or sliders - 1, 2, or 3 per planet
+
+--Planet types
+    --Small terrestrial planet - 1 RES - [ o ]
+    --Large terrestrial planet - 2 RES - [ O ]
+    --Ice giant                - 2 RES - [(o)]
+    --Gas giant                - 3 RES - [(O)] 
+
+--DEF stat - base planet treated as 1 higher DEF, always has an asterisk satellite around it
+--DEF satellites appear at different DEF levels
+    -- level 2 - 2 surrounding dots
+    -- level 3 - 3 surrounding dots
+    -- level 4 - 4 surrounding dots
+    -- level 5 - 4 surrounding dots, 1 asterisk 
+    -- level 6 - 5 surrounding dots, 1 asterisk
+    -- level 7 - 6 surrounding dots, 1 asterisk
+    -- level 8 - 6 surrounding dots, 2 asterisk 
+    -- level 9 - 7 surrounding dots, 2 asterisk 
+    -- level 10 - 7 surrounding dots, 3 asterisk  
+
+--Ships
+    -- Ships are an arrow in the direction they travel ( ^ , > , v , < )
+    -- TEC stat of 4 upgrades them 
+	-- #> , <#
+        -- ^ , #
+	-- # , v
+
+--Sliders
+    --Selected per phase, provides bonuses but at a cost, value of 0-2 in each direction
+	--DEF <==|==> ATK - provides bonus to DEF or ATK
+	--AUT <==|==> DEM - provides bonus to GOV or NAV
+	--ENV <==|==> IND - provides bonus to RES or TEC
+
+--Civs, currently unnamed
+    --Warlike
+	--ATK - 3
+	--DEF - 1
+	--NAV - 1
+	--GOV - 1
+	--TEC - 1
+	--RES - 1
+    --Defensive
+	--ATK - 1
+	--DEF - 3
+	--NAV - 1
+	--GOV - 1
+	--TEC - 1
+	--RES - 1
+    --Explorer
+	--ATK - 1
+	--DEF - 1
+	--NAV - 3
+	--GOV - 1
+	--TEC - 1
+	--RES - 1
+    --Autocracy
+	--ATK - 1
+	--DEF - 1
+	--NAV - 3
+	--GOV - 1
+	--TEC - 1
+	--RES - 1
+    --Technology
+	--ATK - 1
+	--DEF - 1
+	--NAV - 1
+	--GOV - 1
+	--TEC - 3
+	--RES - 1
+
+--Attributes
+    --Each phase give 3 points each to civ stats (none to resources)
+    --Phase 1 - pick 2 to give 2 points each
+    --Phase 2 - pick 3 to give 2 points each
+    --Phase 3 - pick 3 to give 3 points each
+    --Phase 4 - pick 3 to give 4 points each
+    --Phase 5 - pick 4 to give 2 points each
+    
+
+--1-4 players, one can be human
+    --1 player spawns 5-8 planets
+    --2 player spawns 8-12 planets
+    --3 player spawns 12-15 planets
+    --4 player spawns 16-20 planets
+
