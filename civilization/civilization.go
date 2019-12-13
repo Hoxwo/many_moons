@@ -13,10 +13,13 @@ type Civilization struct {
     maxshipsavailable int // (base value 1 + (1 for tech level 4, 2 for tech level 7, 3 for tech level 10) start phase with these ships available 
     shiptimer int // base value - (multiplier * technology level + resource level)
     colonizationtime int //base value - (multiplier * government level + resource level)
+    atkdefslider int // -2, -1, 0, 1, 2
+    autdemslider int // -2, -1, 0, 1, 2
+    envindslider int // -2, -1, 0, 1, 2
 }
 
-func New(civilization string, speed int, attack int, defense int, navigation int, government int, technology int, resources int, shipsavailable int, maxshipsavailable int, shiptimer int, colonizationtime int) Civilization {
-    c := Civilization {civilization, speed, attack, defense, navigation, government, technology, resources, shipsavilable, maxshipsavailable, shiptimer, colonizationtime}
+func New(civilization string, color string, attack int, defense int, navigation int, government int, technology int, resources int, shipsavailable int, maxshipsavailable int, shiptimer int, colonizationtime int) Civilization {
+    c := Civilization {civilization, color, attack, defense, navigation, government, technology, resources, shipsavilable, maxshipsavailable, shiptimer, colonizationtime, atkdefslider, autdemslider, envindslider}
     return c
 }
 
@@ -116,7 +119,26 @@ func (c Civilization) Colonizationtime() int {
     return c.colonizationtime
 }
 
+func (c *Civilization) SetAtkdefslider(atkdefslider int) {
+    c.atkdefslider = atkdefslider
+}
 
+func (c Civilization) Atkdefslider() int {
+    return c.atkdefslider
+}
 
+func (c *Civilization) SetAutdemslider(autdemslider int) {
+    c.autdemslider = autdemslider
+}
 
+func (c Civilization) Autdemslider() int {
+    return c.autdemslider
+}
 
+func (c *Civilization) SetEnvindslider(envindslider int) {
+    c.envindslider = envindslider
+}
+
+func (c Civilization) Envindslider() int {
+    return c.envindslider
+}

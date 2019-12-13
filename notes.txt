@@ -34,46 +34,54 @@
 
 --Sliders
     --Selected per phase, provides bonuses but at a cost, value of 0-2 in each direction
+    --Can only move one value per phase
 	--DEF <==|==> ATK - provides bonus to DEF or ATK
 	--AUT <==|==> DEM - provides bonus to GOV or NAV
 	--ENV <==|==> IND - provides bonus to RES or TEC
 
 --Civs, currently unnamed
+    --Balanced
+	--ATK - 2
+	--DEF - 2
+	--NAV - 2
+	--GOV - 2
+	--TEC - 2
+	--RES - 2
     --Warlike
 	--ATK - 3
-	--DEF - 1
-	--NAV - 1
-	--GOV - 1
+	--DEF - 2
+	--NAV - 2
+	--GOV - 2
 	--TEC - 1
 	--RES - 1
     --Defensive
-	--ATK - 1
+	--ATK - 2
 	--DEF - 3
-	--NAV - 1
-	--GOV - 1
+	--NAV - 2
+	--GOV - 2
 	--TEC - 1
 	--RES - 1
     --Explorer
 	--ATK - 1
 	--DEF - 1
 	--NAV - 3
-	--GOV - 1
-	--TEC - 1
-	--RES - 1
+	--GOV - 2
+	--TEC - 2
+	--RES - 2
     --Autocracy
-	--ATK - 1
+	--ATK - 2
 	--DEF - 1
-	--NAV - 3
-	--GOV - 1
+	--NAV - 2
+	--GOV - 3
 	--TEC - 1
-	--RES - 1
+	--RES - 2
     --Technology
 	--ATK - 1
-	--DEF - 1
-	--NAV - 1
+	--DEF - 2
+	--NAV - 2
 	--GOV - 1
 	--TEC - 3
-	--RES - 1
+	--RES - 2
 
 --Attributes
     --Each phase give 3 points each to civ stats (none to resources)
