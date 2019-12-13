@@ -10,8 +10,8 @@
 --Planet types
     --Small terrestrial planet - 1 RES - [ o ]
     --Large terrestrial planet - 2 RES - [ O ]
-    --Ice giant                - 2 RES - [(o)]
-    --Gas giant                - 3 RES - [(O)] 
+    --Ice giant                - 2 RES - [(o)] - requires NAV or TEC level of 5
+    --Gas giant                - 3 RES - [(O)] - requires NAV or TEC level of 7
 
 --DEF stat - base planet treated as 1 higher DEF, always has an asterisk satellite around it
 --DEF satellites appear at different DEF levels
