@@ -175,10 +175,10 @@ func main() {
 	playercivstatspane.Title = fmt.Sprintf("%s", civilizations[0].Name())
 	playercivstatspane.Text = PlayerCivilizationStatsText(civilizations)
 	playercivstatspane.SetRect(78, 14, 116, 19)
-	playercivstatspane.BorderStyle.Fg = ui.ColorBlue
+	playercivstatspane.BorderStyle.Fg = ui.ColorCyan
 
 	selectplanetinfopane := widgets.NewParagraph()
-	selectplanetinfopane.Title = "Planet Info (<,> select planet, [s] send ship)"
+	selectplanetinfopane.Title = "Planet Info"
 	selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet)
 	selectplanetinfopane.SetRect(78, 19, 116, 34)
 	selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
@@ -319,10 +319,10 @@ func main() {
 			playercivstatspane.Title = fmt.Sprintf("%s", civilizations[0].Name())
 			playercivstatspane.Text = PlayerCivilizationStatsText(civilizations)
 			playercivstatspane.SetRect(78, 14, 116, 19)
-			playercivstatspane.BorderStyle.Fg = ui.ColorBlue
+			playercivstatspane.BorderStyle.Fg = ui.ColorCyan
 
 			selectplanetinfopane := widgets.NewParagraph()
-			selectplanetinfopane.Title = "Planet Info (<,> select planet, [s] send ship)"
+			selectplanetinfopane.Title = "Planet Info"
 			selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet)
 			selectplanetinfopane.SetRect(78, 19, 116, 34)
 			selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
@@ -435,16 +435,52 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int) string {
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet occupied by: %s", occupied)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet resource value: %d", resources)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet coordinates: (%d,%d)", xcoord, ycoord)
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nDistance from your base planet: 0") //TO DO
+	if(planettype == "Ice Giant") {
+		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV or TEC level 4 required](fg:red)")
+		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[to colonize this planet](fg:red)")
+	} else if(planettype == "Gas Giant") {
+		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV or TEC level 7 required](fg:red)")
+		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[to colonize this planet](fg:red)")	
+	} else {
+		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
+		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")	
+	}
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[<, >] to select planet")
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[s] to send ship")
 
 	return selectedPlanetText
 }
 
 func GenerateSpace(planets []*planet.Planet) []*planet.Planet {
 	numberplanets := 15 //random(16, 20)
+	xcoordsused := make([]int, 0)
+	ycoordsused := make([]int, 0) 
 	for i := 0;  i <= numberplanets; i++ {
 		planettype := random(1,5) // 1 - small rocky planet, 2 - large rocky planet, 3 - ice giant, 4 - gas giant
-		xcoord := random(3, 74) 
-		ycoord := random(3, 31)
+		
+		//don't duplicate any coordinates
+		xcoord := 0
+		for xcoord == 0 || contains(xcoordsused, xcoord) {
+			xcoord = random(3,74)
+			if(contains(xcoordsused, xcoord) == false) {
+				xcoordsused = append(xcoordsused, xcoord)
+				break
+			}		
+		}
+		
+		ycoord := 0
+		for ycoord == 0 || contains(ycoordsused, ycoord) {
+			ycoord = random(3, 31)
+			if(contains(ycoordsused, ycoord) == false) {
+				ycoordsused = append(ycoordsused, ycoord)
+				break
+			}		
+		}
+	
 		if(planettype == 1) {
 			p0 := planet.New("ST", "o",   1, "uncolonized", "Small Terrestrial", xcoord, ycoord)
 			planets = append(planets, &p0)
@@ -474,5 +510,14 @@ func isThreeAway(numtocheck int, othernum int) bool {
 	} else {
 		return false
 	}
+}
+
+func contains(s []int, e int) bool {
+    for _, a := range s {
+        if a == e {
+            return true
+        }
+    }
+    return false
 }
 
