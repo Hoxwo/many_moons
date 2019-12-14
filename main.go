@@ -34,8 +34,8 @@ func main() {
 	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 30, 30, 0, 0, 0)
 	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 30, 30, 0, 0, 0)
 	c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 1, 1, 30, 30, 0, 0, 0)
-	c4 := civilization.New("Autocracy",  "blue",    2, 1, 2, 3, 1, 2, 1, 1, 30, 30, 0, 0, 0)
-	c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)				
+	//c4 := civilization.New("Autocracy",  "blue",    2, 1, 2, 3, 1, 2, 1, 1, 30, 30, 0, 0, 0)
+	//c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)				
 
 	//add them to master list
 	civilizations = append(civilizations, &c0, &c1, &c2, &c3, &c4, &c5)	
@@ -59,34 +59,36 @@ func main() {
 
 	//ui.Render(planetmap, datapane)
 
-	p0 := widgets.NewParagraph()
-	p0.Text = "Borderless Text"
-	p0.SetRect(0, 0, 20, 5)
-	p0.Border = false
+	planetmap := widgets.NewParagraph()
+	planetmap.Text = ""
+	planetmap.SetRect(0, 0, 78, 34)
+	planetmap.BorderStyle.Fg = ui.ColorWhite
 
-	p1 := widgets.NewParagraph()
-	p1.Title = "标签"
-	p1.Text = "你好，世界。"
-	p1.SetRect(20, 0, 35, 5)
+	civstatspane := widgets.NewParagraph()
+	civstatspane.Title = "Civilization Stats"
+	civstatspane.Text = "" //"Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
+	civstatspane.SetRect(78, 0, 116, 9)
+	civstatspane.BorderStyle.Fg = ui.ColorBlue
 
-	p2 := widgets.NewParagraph()
-	p2.Title = "Multiline"
-	p2.Text = "Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
-	p2.SetRect(0, 5, 35, 10)
-	p2.BorderStyle.Fg = ui.ColorYellow
+	sliderspane := widgets.NewParagraph()
+	sliderspane.Title = "Policy Sliders"
+	sliderspane.Text = "" //"Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
+	sliderspane.SetRect(78, 9, 116, 13)
+	sliderspane.BorderStyle.Fg = ui.ColorCyan
 
-	p3 := widgets.NewParagraph()
-	p3.Title = "Auto Trim"
-	p3.Text = "Long text with label and it is auto trimmed."
-	p3.SetRect(0, 10, 40, 15)
+	yourcivstatspane := widgets.NewParagraph()
+	yourcivstatspane.Title = "<Your civilization name>"
+	yourcivstatspane.Text = "" //"Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
+	yourcivstatspane.SetRect(78, 13, 116, 18)
+	yourcivstatspane.BorderStyle.Fg = ui.ColorBlue
 
-	p4 := widgets.NewParagraph()
-	p4.Title = "Text Box with Wrapping"
-	p4.Text = "Press q to QUIT THE DEMO. [There](fg:blue,mod:bold) are other things [that](fg:red) are going to fit in here I think. What do you think? Now is the time for all good [men to](bg:blue) come to the aid of their country. [This is going to be one really really really long line](fg:green) that is going to go together and stuffs and things. Let's see how this thing renders out.\n    Here is a new paragraph and stuffs and things. There should be a tab indent at the beginning of the paragraph. Let's see if that worked as well."
-	p4.SetRect(40, 0, 70, 20)
-	p4.BorderStyle.Fg = ui.ColorBlue
+	selectplanetinfopane := widgets.NewParagraph()
+	selectplanetinfopane.Title = "Selected Planet"
+	selectplanetinfopane.Text = "" //"Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
+	selectplanetinfopane.SetRect(78, 18, 116, 34)
+	selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 
-	ui.Render(p0, p1, p2, p3, p4)
+	ui.Render(planetmap, civstatspane, sliderspane, yourcivstatspane, selectplanetinfopane)
 
 	uiEvents := ui.PollEvents()
 	for {
