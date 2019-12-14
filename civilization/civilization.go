@@ -18,20 +18,20 @@ type Civilization struct {
     envindslider int // -2, -1, 0, 1, 2
 }
 
-func New(civilization string, color string, attack int, defense int, navigation int, government int, technology int, resources int, shipsavailable int, maxshipsavailable int, shiptimer int, colonizationtime int) Civilization {
-    c := Civilization {civilization, color, attack, defense, navigation, government, technology, resources, shipsavilable, maxshipsavailable, shiptimer, colonizationtime, atkdefslider, autdemslider, envindslider}
+func New(civilization string, color string, attack int, defense int, navigation int, government int, technology int, resources int, shipsavailable int, maxshipsavailable int, shiptimer int, colonizationtime int, atkdefslider int, autdemslider int, envindslider int) Civilization {
+    c := Civilization {civilization, color, attack, defense, navigation, government, technology, resources, shipsavailable, maxshipsavailable, shiptimer, colonizationtime, atkdefslider, autdemslider, envindslider}
     return c
 }
 
 func (c *Civilization) SetName(name string) {
-    c.name = civilization
+    c.name = name
 }
 
 func (c Civilization) Name() string {
     return c.name
 }
 
-func (c *Civilization) SetColor(name string) {
+func (c *Civilization) SetColor(color string) {
     c.color = color
 }
 

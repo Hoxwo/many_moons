@@ -11,18 +11,18 @@ func New(civilization string, speed int) Ship {
 }
 
 func (s *Ship) SetCivilization(civilization string) {
-    p.civilization = civilization
+    s.civilization = civilization
 }
 
 func (s Ship) Civilization() string {
-    return p.civilization
+    return s.civilization
 }
 
 func (s *Ship) SetSpeed(speed int) {
-    p.speed = speed
+    s.speed = speed
 }
 
-func (s Ship) Appearance() string {
-    return p.speed
+func (s Ship) Speed() int {
+    return s.speed
 }
 

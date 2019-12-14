@@ -21,7 +21,7 @@ func (p Planet) Name() string {
     return p.name
 }
 
-func (p *Planet) SetAppearance(name string) {
+func (p *Planet) SetAppearance(appearance string) {
     p.appearance = appearance
 }
 
@@ -29,15 +29,15 @@ func (p Planet) Appearance() string {
     return p.appearance
 }
 
-func (p *Planet) SetResources(name string) {
+func (p *Planet) SetResources(resources int) {
     p.resources = resources
 }
 
-func (p Planet) Resources() string {
+func (p Planet) Resources() int {
     return p.resources
 }
 
-func (p *Planet) SetOccupied(name string) {
+func (p *Planet) SetOccupied(occupied string) {
     p.occupied = occupied
 }
 
@@ -45,7 +45,7 @@ func (p Planet) Occupied() string {
     return p.occupied
 }
 
-func (p *Planet) SetPlanettype(name string) {
+func (p *Planet) SetPlanettype(planettype string) {
     p.planettype = planettype
 }
 
