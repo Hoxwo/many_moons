@@ -6,10 +6,12 @@ type Planet struct {
     resources int
     occupied string
     planettype string
+    xcoord int
+    ycoord int
 }
 
-func New(name string, appearance string, resources int, occupied string, planettype string) Planet {
-    p := Planet {name, appearance, resources, occupied, planettype}
+func New(name string, appearance string, resources int, occupied string, planettype string, xcoord int, ycoord int) Planet {
+    p := Planet {name, appearance, resources, occupied, planettype, xcoord, ycoord}
     return p
 }
 
@@ -51,4 +53,20 @@ func (p *Planet) SetPlanettype(planettype string) {
 
 func (p Planet) Planettype() string {
     return p.planettype
+}
+
+func (p *Planet) SetXcoord(xcoord int) {
+    p.xcoord = xcoord
+}
+
+func (p Planet) Xcoord() int {
+    return p.xcoord
+}
+
+func (p *Planet) SetYcoord(ycoord int) {
+    p.ycoord = ycoord
+}
+
+func (p Planet) Ycoord() int {
+    return p.ycoord
 }

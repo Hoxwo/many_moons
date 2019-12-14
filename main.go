@@ -5,7 +5,7 @@ import "log"
 import "math/rand"
 import "time"
 //import "strings"
-//import planet "many_moons/planet"
+import planet "many_moons/planet"
 //import ship "many_moons/ship"
 import civilization "many_moons/civilization"
 import ui "github.com/gizak/termui/v3"
@@ -18,6 +18,10 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	// array of civilizations 
 	civilizations := make([]*civilization.Civilization, 0)
+	// array of planets
+	planets := make([]*planet.Planet, 0)	
+	// selected planet 
+	selectedplanet := 0 
 
 	//All colors
 	//termui.ColorCyan
@@ -40,6 +44,8 @@ func main() {
 	//add them to master list
 	civilizations = append(civilizations, &c0, &c1, &c2, &c3) //&c4, &c5)	
 
+	//generate all planets, add them to master list
+	planets = GenerateSpace(planets)
 
 	//select first planet
 	//selected = 0
@@ -49,19 +55,107 @@ func main() {
 	}
 	defer ui.Close()
 	
-	//planetmap := ui.NewCanvas()
-	//planetmap.SetRect(0, 0, 78, 34)
-	//planetmap.SetLine(image.Pt(0, 0), image.Pt(10, 20), ui.ColorWhite)
+	//render all planets - this looks horrible
+	planet0box := widgets.NewParagraph()
+	planet0box.Text = fmt.Sprintf("\n  %s  \n", planets[0].Appearance())
+	planet0box.Border = false
+	planet0box.SetRect((planets[0].Xcoord()-4), (planets[0].Ycoord()-2), (planets[0].Xcoord()+4), (planets[0].Ycoord()+2))
+	planet0box.TextStyle.Fg = ui.ColorWhite
 
-	//datapane := ui.NewCanvas()
-	//datapane.SetRect(78, 0, 126, 34)
-	//datapane.SetLine(image.Pt(0, 0), image.Pt(10, 20), ui.ColorWhite)
+	planet1box := widgets.NewParagraph()
+	planet1box.Text = fmt.Sprintf("\n  %s  \n", planets[1].Appearance())
+	planet1box.Border = false
+	planet1box.SetRect((planets[1].Xcoord()-4), (planets[1].Ycoord()-2), (planets[1].Xcoord()+4), (planets[1].Ycoord()+2))
+	planet1box.TextStyle.Fg = ui.ColorWhite
 
-	//ui.Render(planetmap, datapane)
+	planet2box := widgets.NewParagraph()
+	planet2box.Text = fmt.Sprintf("\n  %s  \n", planets[2].Appearance())
+	planet2box.Border = false
+	planet2box.SetRect((planets[2].Xcoord()-4), (planets[2].Ycoord()-2), (planets[2].Xcoord()+4), (planets[2].Ycoord()+2))
+	planet2box.TextStyle.Fg = ui.ColorWhite
 
+	planet3box := widgets.NewParagraph()
+	planet3box.Text = fmt.Sprintf("\n  %s  \n", planets[3].Appearance())
+	planet3box.Border = false
+	planet3box.SetRect((planets[3].Xcoord()-4), (planets[3].Ycoord()-2), (planets[3].Xcoord()+4), (planets[3].Ycoord()+2))
+	planet3box.TextStyle.Fg = ui.ColorWhite
+
+	planet4box := widgets.NewParagraph()
+	planet4box.Text = fmt.Sprintf("\n  %s  \n", planets[4].Appearance())
+	planet4box.Border = false
+	planet4box.SetRect((planets[4].Xcoord()-4), (planets[4].Ycoord()-2), (planets[4].Xcoord()+4), (planets[4].Ycoord()+2))
+	planet4box.TextStyle.Fg = ui.ColorWhite
+
+	planet5box := widgets.NewParagraph()
+	planet5box.Text = fmt.Sprintf("\n  %s  \n", planets[5].Appearance())
+	planet5box.Border = false
+	planet5box.SetRect((planets[5].Xcoord()-4), (planets[5].Ycoord()-2), (planets[5].Xcoord()+4), (planets[5].Ycoord()+2))
+	planet5box.TextStyle.Fg = ui.ColorWhite
+
+	planet6box := widgets.NewParagraph()
+	planet6box.Text = fmt.Sprintf("\n  %s  \n", planets[6].Appearance())
+	planet6box.Border = false
+	planet6box.SetRect((planets[6].Xcoord()-4), (planets[6].Ycoord()-2), (planets[6].Xcoord()+4), (planets[6].Ycoord()+2))
+	planet6box.TextStyle.Fg = ui.ColorWhite
+
+	planet7box := widgets.NewParagraph()
+	planet7box.Text = fmt.Sprintf("\n  %s  \n", planets[7].Appearance())
+	planet7box.Border = false
+	planet7box.SetRect((planets[7].Xcoord()-4), (planets[7].Ycoord()-2), (planets[7].Xcoord()+4), (planets[7].Ycoord()+2))
+	planet7box.TextStyle.Fg = ui.ColorWhite
+
+	planet8box := widgets.NewParagraph()
+	planet8box.Text = fmt.Sprintf("\n  %s  \n", planets[8].Appearance())
+	planet8box.Border = false
+	planet8box.SetRect((planets[8].Xcoord()-4), (planets[8].Ycoord()-2), (planets[8].Xcoord()+4), (planets[8].Ycoord()+2))
+	planet8box.TextStyle.Fg = ui.ColorWhite
+	
+	planet9box := widgets.NewParagraph()
+	planet9box.Text = fmt.Sprintf("\n  %s  \n", planets[0].Appearance())
+	planet9box.Border = false
+	planet9box.SetRect((planets[9].Xcoord()-4), (planets[9].Ycoord()-2), (planets[9].Xcoord()+4), (planets[9].Ycoord()+2))
+	planet9box.TextStyle.Fg = ui.ColorWhite
+	
+	planet10box := widgets.NewParagraph()
+	planet10box.Text = fmt.Sprintf("\n  %s  \n", planets[10].Appearance())
+	planet10box.Border = false
+	planet10box.SetRect((planets[10].Xcoord()-4), (planets[10].Ycoord()-2), (planets[10].Xcoord()+4), (planets[10].Ycoord()+2))
+	planet10box.TextStyle.Fg = ui.ColorWhite
+
+	planet11box := widgets.NewParagraph()
+	planet11box.Text = fmt.Sprintf("\n  %s  \n", planets[11].Appearance())
+	planet11box.Border = false
+	planet11box.SetRect((planets[11].Xcoord()-4), (planets[11].Ycoord()-2), (planets[11].Xcoord()+4), (planets[11].Ycoord()+2))
+	planet11box.TextStyle.Fg = ui.ColorWhite
+
+	planet12box := widgets.NewParagraph()
+	planet12box.Text = fmt.Sprintf("\n  %s  \n", planets[12].Appearance())
+	planet12box.Border = false
+	planet12box.SetRect((planets[12].Xcoord()-4), (planets[12].Ycoord()-2), (planets[12].Xcoord()+4), (planets[12].Ycoord()+2))
+	planet12box.TextStyle.Fg = ui.ColorWhite
+
+	planet13box := widgets.NewParagraph()
+	planet13box.Text = fmt.Sprintf("\n  %s  \n", planets[13].Appearance())
+	planet13box.Border = false
+	planet13box.SetRect((planets[13].Xcoord()-4), (planets[13].Ycoord()-2), (planets[13].Xcoord()+4), (planets[13].Ycoord()+2))
+	planet13box.TextStyle.Fg = ui.ColorWhite
+
+	planet14box := widgets.NewParagraph()
+	planet14box.Text = fmt.Sprintf("\n  %s  \n", planets[14].Appearance())
+	planet14box.Border = false
+	planet14box.SetRect((planets[14].Xcoord()-4), (planets[14].Ycoord()-2), (planets[14].Xcoord()+4), (planets[14].Ycoord()+2))
+	planet14box.TextStyle.Fg = ui.ColorWhite
+	
+	planet15box := widgets.NewParagraph()
+	planet15box.Text = fmt.Sprintf("\n  %s  \n", planets[15].Appearance())
+	planet15box.Border = false
+	planet15box.SetRect((planets[15].Xcoord()-4), (planets[15].Ycoord()-2), (planets[15].Xcoord()+4), (planets[15].Ycoord()+2))
+	planet15box.TextStyle.Fg = ui.ColorWhite
+
+	//render map and stat panes
 	planetmap := widgets.NewParagraph()
 	planetmap.Title = CurrentYearText(currentyear)
-	planetmap.Text = ""
+	planetmap.Text = fmt.Sprintf("%d", len(planets))
 	planetmap.SetRect(0, 0, 78, 34)
 	planetmap.BorderStyle.Fg = ui.ColorWhite
 
@@ -84,12 +178,12 @@ func main() {
 	playercivstatspane.BorderStyle.Fg = ui.ColorBlue
 
 	selectplanetinfopane := widgets.NewParagraph()
-	selectplanetinfopane.Title = "Selected Planet"
-	selectplanetinfopane.Text = "" //"Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
+	selectplanetinfopane.Title = "Planet Info (<,> select planet, [s] send ship)"
+	selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet)
 	selectplanetinfopane.SetRect(78, 19, 116, 34)
 	selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 
-	ui.Render(planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane)
+	ui.Render(planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane, planet0box, planet1box, planet2box, planet3box, planet4box, 		planet5box, planet6box, planet7box, planet8box, planet9box, planet10box, planet11box, planet12box, planet13box, planet14box, planet15box)
 
 	tickerCount := 1
 	tickerCount++
@@ -107,6 +201,102 @@ func main() {
 			EveryCivilizationCountdown(civilizations)
 			
 			//refactor this
+			planet0box := widgets.NewParagraph()
+			planet0box.Text = fmt.Sprintf("\n  %s  \n", planets[0].Appearance())
+			planet0box.Border = false
+			planet0box.SetRect((planets[0].Xcoord()-4), (planets[0].Ycoord()-2), (planets[0].Xcoord()+4), (planets[0].Ycoord()+2))
+			planet0box.TextStyle.Fg = ui.ColorWhite
+
+			planet1box := widgets.NewParagraph()
+			planet1box.Text = fmt.Sprintf("\n  %s  \n", planets[1].Appearance())
+			planet1box.Border = false
+			planet1box.SetRect((planets[1].Xcoord()-4), (planets[1].Ycoord()-2), (planets[1].Xcoord()+4), (planets[1].Ycoord()+2))
+			planet1box.TextStyle.Fg = ui.ColorWhite
+
+			planet2box := widgets.NewParagraph()	
+			planet2box.Text = fmt.Sprintf("\n  %s  \n", planets[2].Appearance())
+			planet2box.Border = false
+			planet2box.SetRect((planets[2].Xcoord()-4), (planets[2].Ycoord()-2), (planets[2].Xcoord()+4), (planets[2].Ycoord()+2))
+			planet2box.TextStyle.Fg = ui.ColorWhite
+
+			planet3box := widgets.NewParagraph()
+			planet3box.Text = fmt.Sprintf("\n  %s  \n", planets[3].Appearance())
+			planet3box.Border = false
+			planet3box.SetRect((planets[3].Xcoord()-4), (planets[3].Ycoord()-2), (planets[3].Xcoord()+4), (planets[3].Ycoord()+2))
+			planet3box.TextStyle.Fg = ui.ColorWhite
+		
+			planet4box := widgets.NewParagraph()
+			planet4box.Text = fmt.Sprintf("\n  %s  \n", planets[4].Appearance())
+			planet4box.Border = false
+			planet4box.SetRect((planets[4].Xcoord()-4), (planets[4].Ycoord()-2), (planets[4].Xcoord()+4), (planets[4].Ycoord()+2))
+			planet4box.TextStyle.Fg = ui.ColorWhite
+
+			planet5box := widgets.NewParagraph()
+			planet5box.Text = fmt.Sprintf("\n  %s  \n", planets[5].Appearance())
+			planet5box.Border = false
+			planet5box.SetRect((planets[5].Xcoord()-4), (planets[5].Ycoord()-2), (planets[5].Xcoord()+4), (planets[5].Ycoord()+2))
+			planet5box.TextStyle.Fg = ui.ColorWhite
+
+			planet6box := widgets.NewParagraph()
+			planet6box.Text = fmt.Sprintf("\n  %s  \n", planets[6].Appearance())
+			planet6box.Border = false
+			planet6box.SetRect((planets[6].Xcoord()-4), (planets[6].Ycoord()-2), (planets[6].Xcoord()+4), (planets[6].Ycoord()+2))
+			planet6box.TextStyle.Fg = ui.ColorWhite
+
+			planet7box := widgets.NewParagraph()
+			planet7box.Text = fmt.Sprintf("\n  %s  \n", planets[7].Appearance())
+			planet7box.Border = false
+			planet7box.SetRect((planets[7].Xcoord()-4), (planets[7].Ycoord()-2), (planets[7].Xcoord()+4), (planets[7].Ycoord()+2))
+			planet7box.TextStyle.Fg = ui.ColorWhite
+
+			planet8box := widgets.NewParagraph()
+			planet8box.Text = fmt.Sprintf("\n  %s  \n", planets[8].Appearance())
+			planet8box.Border = false
+			planet8box.SetRect((planets[8].Xcoord()-4), (planets[8].Ycoord()-2), (planets[8].Xcoord()+4), (planets[8].Ycoord()+2))
+			planet8box.TextStyle.Fg = ui.ColorWhite
+	
+			planet9box := widgets.NewParagraph()
+			planet9box.Text = fmt.Sprintf("\n  %s  \n", planets[0].Appearance())
+			planet9box.Border = false
+			planet9box.SetRect((planets[9].Xcoord()-4), (planets[9].Ycoord()-2), (planets[9].Xcoord()+4), (planets[9].Ycoord()+2))
+			planet9box.TextStyle.Fg = ui.ColorWhite
+	
+			planet10box := widgets.NewParagraph()
+			planet10box.Text = fmt.Sprintf("\n  %s  \n", planets[10].Appearance())
+			planet10box.Border = false
+			planet10box.SetRect((planets[10].Xcoord()-4), (planets[10].Ycoord()-2), (planets[10].Xcoord()+4), (planets[10].Ycoord()+2))
+			planet10box.TextStyle.Fg = ui.ColorWhite
+
+			planet11box := widgets.NewParagraph()
+			planet11box.Text = fmt.Sprintf("\n  %s  \n", planets[11].Appearance())
+			planet11box.Border = false
+			planet11box.SetRect((planets[11].Xcoord()-4), (planets[11].Ycoord()-2), (planets[11].Xcoord()+4), (planets[11].Ycoord()+2))
+			planet11box.TextStyle.Fg = ui.ColorWhite
+
+			planet12box := widgets.NewParagraph()
+			planet12box.Text = fmt.Sprintf("\n  %s  \n", planets[12].Appearance())
+			planet12box.Border = false
+			planet12box.SetRect((planets[12].Xcoord()-4), (planets[12].Ycoord()-2), (planets[12].Xcoord()+4), (planets[12].Ycoord()+2))
+			planet12box.TextStyle.Fg = ui.ColorWhite
+
+			planet13box := widgets.NewParagraph()
+			planet13box.Text = fmt.Sprintf("\n  %s  \n", planets[13].Appearance())
+			planet13box.Border = false
+			planet13box.SetRect((planets[13].Xcoord()-4), (planets[13].Ycoord()-2), (planets[13].Xcoord()+4), (planets[13].Ycoord()+2))
+			planet13box.TextStyle.Fg = ui.ColorWhite
+
+			planet14box := widgets.NewParagraph()
+			planet14box.Text = fmt.Sprintf("\n  %s  \n", planets[14].Appearance())
+			planet14box.Border = false
+			planet14box.SetRect((planets[14].Xcoord()-4), (planets[14].Ycoord()-2), (planets[14].Xcoord()+4), (planets[14].Ycoord()+2))
+			planet14box.TextStyle.Fg = ui.ColorWhite
+	
+			planet15box := widgets.NewParagraph()
+			planet15box.Text = fmt.Sprintf("\n  %s  \n", planets[15].Appearance())	
+			planet15box.Border = false
+			planet15box.SetRect((planets[15].Xcoord()-4), (planets[15].Ycoord()-2), (planets[15].Xcoord()+4), (planets[15].Ycoord()+2))
+			planet15box.TextStyle.Fg = ui.ColorWhite
+
 			planetmap := widgets.NewParagraph()
 			planetmap.Title = CurrentYearText(currentyear)
 			planetmap.Text = ""
@@ -132,13 +322,13 @@ func main() {
 			playercivstatspane.BorderStyle.Fg = ui.ColorBlue
 
 			selectplanetinfopane := widgets.NewParagraph()
-			selectplanetinfopane.Title = "Selected Planet"
-			selectplanetinfopane.Text = ""
+			selectplanetinfopane.Title = "Planet Info (<,> select planet, [s] send ship)"
+			selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet)
 			selectplanetinfopane.SetRect(78, 19, 116, 34)
-			selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue	
+			selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
+			//	
 
-
-			ui.Render(planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane)
+			ui.Render(planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane, planet0box, planet1box, planet2box, 				planet3box, planet4box, planet5box, planet6box, planet7box, planet8box, planet9box, planet10box, planet11box, planet12box, 				planet13box, planet14box, planet15box)
 		}
 	}
 }
@@ -231,3 +421,58 @@ func PlayerCivilizationStatsText(civilizations []*civilization.Civilization) str
 
 	return playercivstatstext
 }
+
+func SelectedPlanetText(planets []*planet.Planet, selectedplanet int) string {
+	name := planets[selectedplanet].Name()
+	planettype := planets[selectedplanet].Planettype()
+	occupied := planets[selectedplanet].Occupied()
+	resources := planets[selectedplanet].Resources()
+	xcoord := planets[selectedplanet].Xcoord()
+	ycoord := planets[selectedplanet].Ycoord()
+	selectedPlanetText := ""
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("Planet name: %s", name)
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet type: %s", planettype)
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet occupied by: %s", occupied)
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet resource value: %d", resources)
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet coordinates: (%d,%d)", xcoord, ycoord)
+
+	return selectedPlanetText
+}
+
+func GenerateSpace(planets []*planet.Planet) []*planet.Planet {
+	numberplanets := 15 //random(16, 20)
+	for i := 0;  i <= numberplanets; i++ {
+		planettype := random(1,5) // 1 - small rocky planet, 2 - large rocky planet, 3 - ice giant, 4 - gas giant
+		xcoord := random(3, 74) 
+		ycoord := random(3, 31)
+		if(planettype == 1) {
+			p0 := planet.New("ST", "o",   1, "uncolonized", "Small Terrestrial", xcoord, ycoord)
+			planets = append(planets, &p0)
+		} else if(planettype == 2) {
+			p0 := planet.New("LT", "O",   2, "uncolonized", "Large Terrestrial", xcoord, ycoord)
+			planets = append(planets, &p0)		
+		} else if(planettype == 3) {
+			p0 := planet.New("IG", "(o)",   2, "uncolonized", "Ice Giant", xcoord, ycoord)
+			planets = append(planets, &p0)
+		} else {
+			p0 := planet.New("GG", "(O)",   3, "uncolonized", "Gas Giant", xcoord, ycoord)
+			planets = append(planets, &p0)
+		}
+	}
+	
+        return planets
+}
+
+//6 sided die = random(1,7)
+func random(min, max int) int {
+    return rand.Intn(max - min) + min
+}
+
+func isThreeAway(numtocheck int, othernum int) bool {
+	if((numtocheck > othernum && (numtocheck - 3) > othernum) || (numtocheck < othernum && (othernum - 3) < numtocheck)) {
+		return true        
+	} else {
+		return false
+	}
+}
+

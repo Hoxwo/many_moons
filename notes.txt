@@ -10,7 +10,7 @@
 --Planet types
     --Small terrestrial planet - 1 RES - [ o ]
     --Large terrestrial planet - 2 RES - [ O ]
-    --Ice giant                - 2 RES - [(o)] - requires NAV or TEC level of 5
+    --Ice giant                - 2 RES - [(o)] - requires NAV or TEC level of 4
     --Gas giant                - 3 RES - [(O)] - requires NAV or TEC level of 7
 
 --DEF stat - base planet treated as 1 higher DEF, always has an asterisk satellite around it
@@ -93,8 +93,5 @@
     
 
 --1-4 players, one can be human
-    --1 player spawns 5-8 planets
-    --2 player spawns 8-12 planets
-    --3 player spawns 12-15 planets
-    --4 player spawns 16-20 planets
+    -- spawns 16-20 planets
 
