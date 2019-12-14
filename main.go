@@ -14,7 +14,7 @@ import "github.com/gizak/termui/v3/widgets"
 func main() {
 	// set the current year to 0
 	// currentyear := 0
-	//for randos
+	// for randos
 	rand.Seed(time.Now().UTC().UnixNano())
 	// array of civilizations 
 	civilizations := make([]*civilization.Civilization, 0)
@@ -30,7 +30,7 @@ func main() {
 	
 	// set up civilizations
 	// 	       {civilization, color, atk, def, nav, gov, tec, res, shipsavail, maxshipsavail, shiptimer, colonizationtime, adsli, ademsli, eisli}
-	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 1, 1, 30, 30, 0, 0, 0)
+	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 1, 1, 30, 30, 1, 2, -1)
 	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 30, 30, 0, 0, 0)
 	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 30, 30, 0, 0, 0)
 	c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 1, 1, 30, 30, 0, 0, 0)
@@ -72,14 +72,14 @@ func main() {
 
 	sliderspane := widgets.NewParagraph()
 	sliderspane.Title = "Policy Sliders"
-	sliderspane.Text = "" //"Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
-	sliderspane.SetRect(78, 9, 116, 13)
+	sliderspane.Text = PlayerSlidersText(civilizations)
+	sliderspane.SetRect(78, 9, 116, 14)
 	sliderspane.BorderStyle.Fg = ui.ColorCyan
 
 	yourcivstatspane := widgets.NewParagraph()
-	yourcivstatspane.Title = "<Your civilization name>"
+	yourcivstatspane.Title = fmt.Sprintf("%s", civilizations[0].Name())
 	yourcivstatspane.Text = ""
-	yourcivstatspane.SetRect(78, 13, 116, 18)
+	yourcivstatspane.SetRect(78, 14, 116, 18)
 	yourcivstatspane.BorderStyle.Fg = ui.ColorBlue
 
 	selectplanetinfopane := widgets.NewParagraph()
@@ -108,10 +108,54 @@ func CivilizationStatsText(civilizations []*civilization.Civilization) string {
 	return civilizationstatstext
 }
 
+func PlayerSlidersText(civilizations []*civilization.Civilization) string {
+	atkdefval := civilizations[0].Atkdefslider()
+	autdemval := civilizations[0].Autdemslider()
+	envindval := civilizations[0].Envindslider()
+	playersliderstext := ""
+	playersliderstext = playersliderstext + fmt.Sprintf("DEF %s ATK %s", SliderValueToString(atkdefval), SliderValueToMessage(atkdefval, "DEF", "ATK"))
+	playersliderstext = playersliderstext + fmt.Sprintf("\nAUT %s DEM %s", SliderValueToString(autdemval), SliderValueToMessage(autdemval, "GOV", "NAV"))
+	playersliderstext = playersliderstext + fmt.Sprintf("\nENV %s IND %s", SliderValueToString(envindval), SliderValueToMessage(envindval, "RES", "TEC"))
+	
+	return playersliderstext
+}
+
 func SpacePadding(stringLength int) string { 
 	padding := "  "
 	for i := 0;  i <= (8 - stringLength); i++ {
                 padding = padding + " "
         } 
  	return padding
+}
+
+func SliderValueToString(slidervalue int) string {
+	if(slidervalue == -2) {
+        	return "<|====>"  	
+	} else if(slidervalue == -1) {
+        	return "<=|===>"  	
+	} else if(slidervalue == 0) {
+        	return "<==|==>"  	
+	} else if(slidervalue == 1) {
+        	return "<===|=>"  	
+	} else if(slidervalue == 2) {
+        	return "<====|>"  	
+	} else {
+		return "ERROR"
+	}
+}
+
+func SliderValueToMessage(slidervalue int, firsttrait string, secondtrait string) string {
+	if(slidervalue == -2) {
+        	return fmt.Sprintf("[+2 to %s](fg:blue) [-2 to %s](fg:red)", firsttrait, secondtrait)  	
+	} else if(slidervalue == -1) {
+        	return fmt.Sprintf("[+1 to %s](fg:blue) [-1 to %s](fg:red)", firsttrait, secondtrait)	
+	} else if(slidervalue == 0) {
+        	return fmt.Sprintf("[+0 to %s](fg:white) [+0 to %s](fg:white)", firsttrait, secondtrait)	
+	} else if(slidervalue == 1) {
+        	return fmt.Sprintf("[-1 to %s](fg:red) [+1 to %s](fg:blue)", firsttrait, secondtrait)
+	} else if(slidervalue == 2) {
+        	return fmt.Sprintf("[-2 to %s](fg:red) [+2 to %s](fg:blue)", firsttrait, secondtrait)	
+	} else {
+		return "ERROR"
+	}
 }
