@@ -13,7 +13,7 @@ import "github.com/gizak/termui/v3/widgets"
 
 func main() {
 	// set the current year to 0
-	// currentyear := 0
+	currentyear := 5000
 	// for randos
 	rand.Seed(time.Now().UTC().UnixNano())
 	// array of civilizations 
@@ -29,11 +29,11 @@ func main() {
 	//termui.ColorRed
 	
 	// set up civilizations
-	// 	       {civilization, color, atk, def, nav, gov, tec, res, shipsavail, maxshipsavail, shiptimer, colonizationtime, adsli, ademsli, eisli}
-	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 1, 1, 30, 30, 1, 2, -1)
-	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 30, 30, 0, 0, 0)
-	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 30, 30, 0, 0, 0)
-	c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 1, 1, 30, 30, 0, 0, 0)
+	// 	       {civilization, color, atk, def, nav, gov, tec, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
+	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 30, 1, 2, -1)
+	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 0, 30, 30, 0, 0, 0)
+	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 0, 30, 30, 0, 0, 0)
+	c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 1, 1, 0, 30, 30, 0, 0, 0)
 	//c4 := civilization.New("Autocracy",  "blue",    2, 1, 2, 3, 1, 2, 1, 1, 30, 30, 0, 0, 0)
 	//c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)				
 
@@ -60,6 +60,7 @@ func main() {
 	//ui.Render(planetmap, datapane)
 
 	planetmap := widgets.NewParagraph()
+	planetmap.Title = CurrentYearText(currentyear)
 	planetmap.Text = ""
 	planetmap.SetRect(0, 0, 78, 34)
 	planetmap.BorderStyle.Fg = ui.ColorWhite
@@ -76,26 +77,68 @@ func main() {
 	sliderspane.SetRect(78, 9, 116, 14)
 	sliderspane.BorderStyle.Fg = ui.ColorCyan
 
-	yourcivstatspane := widgets.NewParagraph()
-	yourcivstatspane.Title = fmt.Sprintf("%s", civilizations[0].Name())
-	yourcivstatspane.Text = ""
-	yourcivstatspane.SetRect(78, 14, 116, 18)
-	yourcivstatspane.BorderStyle.Fg = ui.ColorBlue
+	playercivstatspane := widgets.NewParagraph()
+	playercivstatspane.Title = fmt.Sprintf("%s", civilizations[0].Name())
+	playercivstatspane.Text = PlayerCivilizationStatsText(civilizations)
+	playercivstatspane.SetRect(78, 14, 116, 19)
+	playercivstatspane.BorderStyle.Fg = ui.ColorBlue
 
 	selectplanetinfopane := widgets.NewParagraph()
 	selectplanetinfopane.Title = "Selected Planet"
 	selectplanetinfopane.Text = "" //"Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
-	selectplanetinfopane.SetRect(78, 18, 116, 34)
+	selectplanetinfopane.SetRect(78, 19, 116, 34)
 	selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 
-	ui.Render(planetmap, civstatspane, sliderspane, yourcivstatspane, selectplanetinfopane)
+	ui.Render(planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane)
 
+	tickerCount := 1
+	tickerCount++
 	uiEvents := ui.PollEvents()
+	ticker := time.NewTicker(time.Second).C
 	for {
-		e := <-uiEvents
-		switch e.ID {
-		case "q", "<C-c>":
-			return
+		select {
+		case e := <-uiEvents:
+			switch e.ID {
+			case "q", "<C-c>":
+				return
+			}
+		case <-ticker:
+			currentyear = currentyear + 1
+			EveryCivilizationCountdown(civilizations)
+			
+			//refactor this
+			planetmap := widgets.NewParagraph()
+			planetmap.Title = CurrentYearText(currentyear)
+			planetmap.Text = ""
+			planetmap.SetRect(0, 0, 78, 34)
+			planetmap.BorderStyle.Fg = ui.ColorWhite
+
+			civstatspane := widgets.NewParagraph()
+			civstatspane.Title = "Civilization Stats"
+			civstatspane.Text = CivilizationStatsText(civilizations)
+			civstatspane.SetRect(78, 0, 116, 9)
+			civstatspane.BorderStyle.Fg = ui.ColorBlue
+
+			sliderspane := widgets.NewParagraph()
+			sliderspane.Title = "Policy Sliders"
+			sliderspane.Text = PlayerSlidersText(civilizations)
+			sliderspane.SetRect(78, 9, 116, 14)
+			sliderspane.BorderStyle.Fg = ui.ColorCyan
+
+			playercivstatspane := widgets.NewParagraph()
+			playercivstatspane.Title = fmt.Sprintf("%s", civilizations[0].Name())
+			playercivstatspane.Text = PlayerCivilizationStatsText(civilizations)
+			playercivstatspane.SetRect(78, 14, 116, 19)
+			playercivstatspane.BorderStyle.Fg = ui.ColorBlue
+
+			selectplanetinfopane := widgets.NewParagraph()
+			selectplanetinfopane.Title = "Selected Planet"
+			selectplanetinfopane.Text = ""
+			selectplanetinfopane.SetRect(78, 19, 116, 34)
+			selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue	
+
+
+			ui.Render(planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane)
 		}
 	}
 }
@@ -158,4 +201,33 @@ func SliderValueToMessage(slidervalue int, firsttrait string, secondtrait string
 	} else {
 		return "ERROR"
 	}
+}
+
+func CurrentYearText(currentyear int) string {
+	return fmt.Sprintf("Current year: %d", currentyear)
+}
+
+func EveryCivilizationCountdown(civilizations []*civilization.Civilization) {
+	for _, c := range civilizations {
+		if(c.Shiptimer() < c.Maxshiptimer()) { 
+			c.SetShiptimer(c.Shiptimer() + 1)
+		} else {
+			c.SetShiptimer(0)
+			if(c.Shipsavailable() < c.Maxshipsavailable()) {
+				c.SetShipsavailable(c.Shipsavailable() + 1)			
+			}
+		}
+	}
+}
+
+func PlayerCivilizationStatsText(civilizations []*civilization.Civilization) string {
+	shipsavailable := civilizations[0].Shipsavailable()
+	maxshipsavailable := civilizations[0].Maxshipsavailable()
+	shiptimer := civilizations[0].Shiptimer()
+	maxshiptimer := civilizations[0].Maxshiptimer()
+	playercivstatstext := ""
+	playercivstatstext = playercivstatstext + fmt.Sprintf("%d/%d ships available", shipsavailable, maxshipsavailable)
+	playercivstatstext = playercivstatstext + fmt.Sprintf("\n%d years left until new ship is ready", (maxshiptimer - shiptimer))
+
+	return playercivstatstext
 }

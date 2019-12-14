@@ -12,14 +12,15 @@ type Civilization struct {
     shipsavailable int 
     maxshipsavailable int // (base value 1 + (1 for tech level 4, 2 for tech level 7, 3 for tech level 10) start phase with these ships available 
     shiptimer int // base value - (multiplier * technology level + resource level)
+    maxshiptimer int	
     colonizationtime int //base value - (multiplier * government level + resource level)
     atkdefslider int // -2, -1, 0, 1, 2
     autdemslider int // -2, -1, 0, 1, 2
     envindslider int // -2, -1, 0, 1, 2
 }
 
-func New(civilization string, color string, attack int, defense int, navigation int, government int, technology int, resources int, shipsavailable int, maxshipsavailable int, shiptimer int, colonizationtime int, atkdefslider int, autdemslider int, envindslider int) Civilization {
-    c := Civilization {civilization, color, attack, defense, navigation, government, technology, resources, shipsavailable, maxshipsavailable, shiptimer, colonizationtime, atkdefslider, autdemslider, envindslider}
+func New(civilization string, color string, attack int, defense int, navigation int, government int, technology int, resources int, shipsavailable int, maxshipsavailable int, shiptimer int, maxshiptimer int, colonizationtime int, atkdefslider int, autdemslider int, envindslider int) Civilization {
+    c := Civilization {civilization, color, attack, defense, navigation, government, technology, resources, shipsavailable, maxshipsavailable, shiptimer, maxshiptimer, colonizationtime, atkdefslider, autdemslider, envindslider}
     return c
 }
 
@@ -110,6 +111,15 @@ func (c *Civilization) SetShiptimer(shiptimer int) {
 func (c Civilization) Shiptimer() int {
     return c.shiptimer
 }
+
+func (c *Civilization) SetMaxshiptimer(maxshiptimer int) {
+    c.maxshiptimer = maxshiptimer
+}
+
+func (c Civilization) Maxshiptimer() int {
+    return c.maxshiptimer
+}
+
 
 func (c *Civilization) SetColonizationtime(colonizationtime int) {
     c.colonizationtime = colonizationtime
