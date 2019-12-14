@@ -227,7 +227,7 @@ func PlayerCivilizationStatsText(civilizations []*civilization.Civilization) str
 	maxshiptimer := civilizations[0].Maxshiptimer()
 	playercivstatstext := ""
 	playercivstatstext = playercivstatstext + fmt.Sprintf("%d/%d ships available", shipsavailable, maxshipsavailable)
-	playercivstatstext = playercivstatstext + fmt.Sprintf("\n%d years left until new ship is ready", (maxshiptimer - shiptimer))
+	playercivstatstext = playercivstatstext + fmt.Sprintf("\n%d years until next ship ready", (maxshiptimer - shiptimer))
 
 	return playercivstatstext
 }
