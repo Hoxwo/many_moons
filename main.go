@@ -1,6 +1,6 @@
 package main
 
-//import "image"
+import "fmt"
 import "log"
 import "math/rand"
 import "time"
@@ -38,7 +38,7 @@ func main() {
 	//c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)				
 
 	//add them to master list
-	civilizations = append(civilizations, &c0, &c1, &c2, &c3, &c4, &c5)	
+	civilizations = append(civilizations, &c0, &c1, &c2, &c3) //&c4, &c5)	
 
 
 	//select first planet
@@ -66,7 +66,7 @@ func main() {
 
 	civstatspane := widgets.NewParagraph()
 	civstatspane.Title = "Civilization Stats"
-	civstatspane.Text = "" //"Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
+	civstatspane.Text = CivilizationStatsText(civilizations)
 	civstatspane.SetRect(78, 0, 116, 9)
 	civstatspane.BorderStyle.Fg = ui.ColorBlue
 
@@ -78,7 +78,7 @@ func main() {
 
 	yourcivstatspane := widgets.NewParagraph()
 	yourcivstatspane.Title = "<Your civilization name>"
-	yourcivstatspane.Text = "" //"Simple colored text\nwith label. It [can be](fg:red) multilined with \\n or [break automatically](fg:red,fg:bold)"
+	yourcivstatspane.Text = ""
 	yourcivstatspane.SetRect(78, 13, 116, 18)
 	yourcivstatspane.BorderStyle.Fg = ui.ColorBlue
 
@@ -98,4 +98,20 @@ func main() {
 			return
 		}
 	}
+}
+
+func CivilizationStatsText(civilizations []*civilization.Civilization) string {
+	civilizationstatstext := "\n          ATK DEF NAV GOV TEC RES"
+	for _, c := range civilizations {
+		civilizationstatstext = civilizationstatstext + fmt.Sprintf("\n%s:%s%d   %d   %d   %d   %d   %d", c.Name(), SpacePadding(len(c.Name())), c.Attack(), c.Defense(), c.Navigation(), c.Government(), c.Technology(), c.Resources())
+	}
+	return civilizationstatstext
+}
+
+func SpacePadding(stringLength int) string { 
+	padding := "  "
+	for i := 0;  i <= (8 - stringLength); i++ {
+                padding = padding + " "
+        } 
+ 	return padding
 }
