@@ -3,6 +3,7 @@ package main
 import "fmt"
 import "log"
 import "math/rand"
+import math "math"
 import "time"
 import "image"
 import "sort"
@@ -22,7 +23,9 @@ func main() {
 	// array of planets
 	planets := make([]*planet.Planet, 0)	
 	// selected planet 
-	selectedplanet := 0 
+	selectedplanet := 0
+	centerofmapx := 0
+ 	centerofmapy := 0
 
 	//All colors
 	//termui.ColorCyan
@@ -34,7 +37,7 @@ func main() {
 	//termui.ColorRed
 	
 	//generate all planets, add them to master list
-	planets = GenerateSpace(planets)
+	planets = GenerateSpace(planets, centerofmapx, centerofmapy)
 
 	// set up civilizations
 	// {name, color, atk, def, nav, gov, tec, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
@@ -390,7 +393,7 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int) string {
 	return selectedPlanetText
 }
 
-func GenerateSpace(planets []*planet.Planet) []*planet.Planet {
+func GenerateSpace(planets []*planet.Planet, centerofmapx int, centerofmapy int) []*planet.Planet {
 	numberplanets := 15 //random(16, 20)
 	xcoordsused := make([]int, 0)
 	ycoordsused := make([]int, 0) 
@@ -435,6 +438,19 @@ func GenerateSpace(planets []*planet.Planet) []*planet.Planet {
 	sort.Slice(planets, func(i, j int) bool {
   		return planets[i].Xcoord() < planets[j].Xcoord()
 	})
+
+	//get center of map for use in making base planets
+	totalx := 0
+	for _, x := range xcoordsused {
+		totalx += x
+	}
+	centerofmapx = math.Floor(totalx/16)
+
+	totaly := 0
+        for _, y := range ycoordsused {
+                totaly += y
+        }
+	centerofmapy = math.Floor(totaly/16)	
 
 	return planets
 }
