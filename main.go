@@ -5,6 +5,7 @@ import "log"
 import "math/rand"
 import "time"
 import "image"
+import "sort"
 import planet "many_moons/planet"
 //import ship "many_moons/ship"
 import civilization "many_moons/civilization"
@@ -32,8 +33,11 @@ func main() {
 	//termui.ColorMagenta
 	//termui.ColorRed
 	
+	//generate all planets, add them to master list
+	planets = GenerateSpace(planets)
+
 	// set up civilizations
-	// 	       {civilization, color, atk, def, nav, gov, tec, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
+	// {name, color, atk, def, nav, gov, tec, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
 	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 30, 1, 2, -1)
 	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 0, 30, 30, 0, 0, 0)
 	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 0, 30, 30, 0, 0, 0)
@@ -44,11 +48,21 @@ func main() {
 	//add them to master list
 	civilizations = append(civilizations, &c0, &c1, &c2, &c3) //&c4, &c5)	
 
-	//generate all planets, add them to master list
-	planets = GenerateSpace(planets)
-
-	//select first planet
-	//selected = 0
+	//set a home planet for each civ
+	usedplanets := make([]int, 0)
+	for _, c := range civilizations {
+		planetnumber := 0
+		for planetnumber == 0 || contains(usedplanets, planetnumber) {
+			planetnumber = random(1,16)
+			if(contains(usedplanets, planetnumber) == false) {
+				usedplanets = append(usedplanets, planetnumber)
+				planets[planetnumber].SetHomeplanet(true)
+				planets[planetnumber].SetOccupied(c.Name())
+				break
+			}		
+		}
+		
+	}
 
 	if err := ui.Init(); err != nil {
 		log.Fatalf("failed to initialize termui: %v", err)
@@ -66,13 +80,37 @@ func main() {
 	planetmap.SetRect(1, 1, 76, 33)
 	for i := 0; i < len(planets); i++ {
 		pt1 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+0))
-		pt2 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+0))
-		pt3 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+1))
-		pt4 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+1))
-		planetmap.SetPoint(pt1, ui.ColorWhite)
-		planetmap.SetPoint(pt2, ui.ColorWhite)
-		planetmap.SetPoint(pt3, ui.ColorWhite)
-		planetmap.SetPoint(pt4, ui.ColorWhite)
+				pt2 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+0))
+				pt3 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+1))
+				pt4 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+1))
+				if(len(planets[i].Occupied()) > 0) {
+					if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "cyan") {
+						planetmap.SetPoint(pt1, ui.ColorCyan)
+						planetmap.SetPoint(pt2, ui.ColorCyan)
+						planetmap.SetPoint(pt3, ui.ColorCyan)
+						planetmap.SetPoint(pt4, ui.ColorCyan)	
+					} else if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "red") {
+						planetmap.SetPoint(pt1, ui.ColorRed)
+						planetmap.SetPoint(pt2, ui.ColorRed)
+						planetmap.SetPoint(pt3, ui.ColorRed)
+						planetmap.SetPoint(pt4, ui.ColorRed)	
+					} else if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "magenta") {
+						planetmap.SetPoint(pt1, ui.ColorMagenta)
+						planetmap.SetPoint(pt2, ui.ColorMagenta)
+						planetmap.SetPoint(pt3, ui.ColorMagenta)
+						planetmap.SetPoint(pt4, ui.ColorMagenta)	
+					} else if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "green") {
+						planetmap.SetPoint(pt1, ui.ColorGreen)
+						planetmap.SetPoint(pt2, ui.ColorGreen)
+						planetmap.SetPoint(pt3, ui.ColorGreen)
+						planetmap.SetPoint(pt4, ui.ColorGreen)	
+					} 
+				} else {
+					planetmap.SetPoint(pt1, ui.ColorWhite)
+					planetmap.SetPoint(pt2, ui.ColorWhite)
+					planetmap.SetPoint(pt3, ui.ColorWhite)
+					planetmap.SetPoint(pt4, ui.ColorWhite)	
+				}
 	}	
 	planetmap.BorderStyle.Fg = ui.ColorWhite
 
@@ -102,20 +140,30 @@ func main() {
 
 	ui.Render(planetmapframe, planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane)
 
-	tickerCount := 1
-	tickerCount++
+	tickerCount := 0
 	uiEvents := ui.PollEvents()
-	ticker := time.NewTicker(time.Second).C
+	ticker := time.NewTicker(time.Millisecond).C
 	for {
+		tickerCount++
 		select {
 		case e := <-uiEvents:
 			switch e.ID {
 			case "q", "<C-c>":
 				return
+			case ",":
+				if(selectedplanet > 0) {
+					selectedplanet--
+				}
+			case ".":
+				if(selectedplanet < 15) {
+					selectedplanet++
+				}
 			}
 		case <-ticker:
-			currentyear = currentyear + 1
-			EveryCivilizationCountdown(civilizations)
+			if(tickerCount % 400 == 1) {
+				currentyear = currentyear + 1
+				EveryCivilizationCountdown(civilizations)
+			}
 			
 			//render map and stat panes
 			planetmapframe := widgets.NewParagraph()
@@ -127,14 +175,53 @@ func main() {
 			planetmap := ui.NewCanvas()
 			planetmap.SetRect(2, 1, 75, 33)
 			for i := 0; i < len(planets); i++ {
+				//this is the ring that shows selected planet
+				if(selectedplanet == i) {
+					spt1 := image.Pt(((planets[i].Xcoord()*2)-3), ((planets[i].Ycoord()*4)-3))
+					spt2 := image.Pt(((planets[i].Xcoord()*2)+3), ((planets[i].Ycoord()*4)-3))
+					spt3 := image.Pt(((planets[i].Xcoord()*2)-3), ((planets[i].Ycoord()*4)+3))
+					spt4 := image.Pt(((planets[i].Xcoord()*2)+3), ((planets[i].Ycoord()*4)+3))
+					planetmap.SetPoint(spt1, ui.ColorYellow)
+					planetmap.SetPoint(spt2, ui.ColorYellow)
+					planetmap.SetPoint(spt3, ui.ColorYellow)
+					planetmap.SetPoint(spt4, ui.ColorYellow)
+				}
+				
+				//these points constitute the planet
 				pt1 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+0))
 				pt2 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+0))
 				pt3 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+1))
 				pt4 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+1))
-				planetmap.SetPoint(pt1, ui.ColorWhite)
-				planetmap.SetPoint(pt2, ui.ColorWhite)
-				planetmap.SetPoint(pt3, ui.ColorWhite)
-				planetmap.SetPoint(pt4, ui.ColorWhite)
+				if(len(planets[i].Occupied()) > 0) {
+					if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "cyan") {
+						planetmap.SetPoint(pt1, ui.ColorCyan)
+						planetmap.SetPoint(pt2, ui.ColorCyan)
+						planetmap.SetPoint(pt3, ui.ColorCyan)
+						planetmap.SetPoint(pt4, ui.ColorCyan)	
+					} else if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "red") {
+						planetmap.SetPoint(pt1, ui.ColorRed)
+						planetmap.SetPoint(pt2, ui.ColorRed)
+						planetmap.SetPoint(pt3, ui.ColorRed)
+						planetmap.SetPoint(pt4, ui.ColorRed)	
+					} else if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "magenta") {
+						planetmap.SetPoint(pt1, ui.ColorMagenta)
+						planetmap.SetPoint(pt2, ui.ColorMagenta)
+						planetmap.SetPoint(pt3, ui.ColorMagenta)
+						planetmap.SetPoint(pt4, ui.ColorMagenta)	
+					} else if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "green") {
+						planetmap.SetPoint(pt1, ui.ColorGreen)
+						planetmap.SetPoint(pt2, ui.ColorGreen)
+						planetmap.SetPoint(pt3, ui.ColorGreen)
+						planetmap.SetPoint(pt4, ui.ColorGreen)	
+					} 
+				} else {
+					planetmap.SetPoint(pt1, ui.ColorWhite)
+					planetmap.SetPoint(pt2, ui.ColorWhite)
+					planetmap.SetPoint(pt3, ui.ColorWhite)
+					planetmap.SetPoint(pt4, ui.ColorWhite)	
+				}
+				//TO DO render satellites here
+				//TO DO render ships here as lines between planets
 			}	
 			planetmap.BorderStyle.Fg = ui.ColorWhite
 
@@ -330,21 +417,26 @@ func GenerateSpace(planets []*planet.Planet) []*planet.Planet {
 		}
 	
 		if(planettype == 1) {
-			p0 := planet.New("ST", "o",   1, "uncolonized", "Small Terrestrial", xcoord, ycoord)
+			p0 := planet.New("ST", "o",   1, "", "Small Terrestrial", xcoord, ycoord, false)
 			planets = append(planets, &p0)
 		} else if(planettype == 2) {
-			p0 := planet.New("LT", "O",   2, "uncolonized", "Large Terrestrial", xcoord, ycoord)
+			p0 := planet.New("LT", "O",   2, "", "Large Terrestrial", xcoord, ycoord, false)
 			planets = append(planets, &p0)		
 		} else if(planettype == 3) {
-			p0 := planet.New("IG", "(o)",   2, "uncolonized", "Ice Giant", xcoord, ycoord)
+			p0 := planet.New("IG", "(o)",   2, "", "Ice Giant", xcoord, ycoord, false)
 			planets = append(planets, &p0)
 		} else {
-			p0 := planet.New("GG", "(O)",   3, "uncolonized", "Gas Giant", xcoord, ycoord)
+			p0 := planet.New("GG", "(O)",   3, "", "Gas Giant", xcoord, ycoord, false)
 			planets = append(planets, &p0)
 		}
 	}
 	
-        return planets
+	//sort it left to right
+	sort.Slice(planets, func(i, j int) bool {
+  		return planets[i].Xcoord() < planets[j].Xcoord()
+	})
+
+	return planets
 }
 
 //6 sided die = random(1,7)
@@ -368,5 +460,24 @@ func tooCloseY(s []int, e int) bool {
         }
     }
     return false
+}
+
+func contains(s []int, e int) bool {
+    for _, a := range s {
+        if a == e {
+            return true
+        }
+    }
+    return false
+}
+
+func findCivilizationColorByName(searchname string, civilizations []*civilization.Civilization) string {
+	for _, c := range civilizations {
+		if(c.Name() == searchname) {
+			return c.Color()
+		}
+	}
+	
+	return "ERROR"
 }
 
