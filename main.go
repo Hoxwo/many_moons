@@ -55,8 +55,6 @@ func main() {
 	}
 	defer ui.Close()
 	
-	//render all planets - this looks horrible
-
 	//render map and stat panes
 	planetmapframe := widgets.NewParagraph()
 	planetmapframe.Title = CurrentYearText(currentyear)
@@ -65,9 +63,16 @@ func main() {
 
 	//canvas-style planet map
 	planetmap := ui.NewCanvas()
-	planetmap.SetRect(1, 1, 77, 33)
+	planetmap.SetRect(1, 1, 76, 33)
 	for i := 0; i < len(planets); i++ {
-		planetmap.SetPoint(image.Pt((planets[i].Xcoord()*2), (planets[i].Ycoord()*4)), ui.ColorWhite)
+		pt1 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+0))
+		pt2 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+0))
+		pt3 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+1))
+		pt4 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+1))
+		planetmap.SetPoint(pt1, ui.ColorWhite)
+		planetmap.SetPoint(pt2, ui.ColorWhite)
+		planetmap.SetPoint(pt3, ui.ColorWhite)
+		planetmap.SetPoint(pt4, ui.ColorWhite)
 	}	
 	planetmap.BorderStyle.Fg = ui.ColorWhite
 
@@ -120,9 +125,16 @@ func main() {
 
 			//canvas-style planet map
 			planetmap := ui.NewCanvas()
-			planetmap.SetRect(1, 1, 77, 33)
+			planetmap.SetRect(2, 1, 75, 33)
 			for i := 0; i < len(planets); i++ {
-				planetmap.SetPoint(image.Pt((planets[i].Xcoord()*2), (planets[i].Ycoord()*4)), ui.ColorWhite)
+				pt1 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+0))
+				pt2 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+0))
+				pt3 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+1))
+				pt4 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+1))
+				planetmap.SetPoint(pt1, ui.ColorWhite)
+				planetmap.SetPoint(pt2, ui.ColorWhite)
+				planetmap.SetPoint(pt3, ui.ColorWhite)
+				planetmap.SetPoint(pt4, ui.ColorWhite)
 			}	
 			planetmap.BorderStyle.Fg = ui.ColorWhite
 
@@ -159,7 +171,20 @@ func main() {
 func CivilizationStatsText(civilizations []*civilization.Civilization) string {
 	civilizationstatstext := "\n          ATK DEF NAV GOV TEC RES"
 	for _, c := range civilizations {
-		civilizationstatstext = civilizationstatstext + fmt.Sprintf("\n%s:%s%d   %d   %d   %d   %d   %d", c.Name(), SpacePadding(len(c.Name())), c.Attack(), c.Defense(), c.Navigation(), c.Government(), c.Technology(), c.Resources())
+		if(c.Color() == "cyan"){
+		civilizationstatstext = civilizationstatstext + fmt.Sprintf("[\n%s:%s%d   %d   %d   %d   %d   %d](fg:cyan)", c.Name(), 										     SpacePadding(len(c.Name())), c.Attack(), c.Defense(), 
+									     c.Navigation(), c.Government(), c.Technology(), c.Resources())
+		}else if(c.Color() == "red"){
+		civilizationstatstext = civilizationstatstext + fmt.Sprintf("[\n%s:%s%d   %d   %d   %d   %d   %d](fg:red)", c.Name(), 										     SpacePadding(len(c.Name())), c.Attack(), c.Defense(), 
+									     c.Navigation(), c.Government(), c.Technology(), c.Resources())
+		}else if(c.Color() == "magenta"){
+		civilizationstatstext = civilizationstatstext + fmt.Sprintf("[\n%s:%s%d   %d   %d   %d   %d   %d](fg:magenta)", c.Name(), 										     SpacePadding(len(c.Name())), c.Attack(), c.Defense(), 
+									     c.Navigation(), c.Government(), c.Technology(), c.Resources())
+		}else if(c.Color() == "green"){
+		civilizationstatstext = civilizationstatstext + fmt.Sprintf("[\n%s:%s%d   %d   %d   %d   %d   %d](fg:green)", c.Name(), 									     SpacePadding(len(c.Name())), c.Attack(), c.Defense(), 
+									     c.Navigation(), c.Government(), c.Technology(), c.Resources())
+		}
+
 	}
 	return civilizationstatstext
 }
