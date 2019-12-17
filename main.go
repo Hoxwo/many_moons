@@ -417,16 +417,16 @@ func GenerateSpace(planets []*planet.Planet) []*planet.Planet {
 		}
 	
 		if(planettype == 1) {
-			p0 := planet.New("ST", "o",   1, "", "Small Terrestrial", xcoord, ycoord, false)
+			p0 := planet.New("ST", "o",   1, "", "Small Terrestrial", xcoord, ycoord, false, 0)
 			planets = append(planets, &p0)
 		} else if(planettype == 2) {
-			p0 := planet.New("LT", "O",   2, "", "Large Terrestrial", xcoord, ycoord, false)
+			p0 := planet.New("LT", "O",   2, "", "Large Terrestrial", xcoord, ycoord, false, 0)
 			planets = append(planets, &p0)		
 		} else if(planettype == 3) {
-			p0 := planet.New("IG", "(o)",   2, "", "Ice Giant", xcoord, ycoord, false)
+			p0 := planet.New("IG", "(o)",   2, "", "Ice Giant", xcoord, ycoord, false, 0)
 			planets = append(planets, &p0)
 		} else {
-			p0 := planet.New("GG", "(O)",   3, "", "Gas Giant", xcoord, ycoord, false)
+			p0 := planet.New("GG", "(O)",   3, "", "Gas Giant", xcoord, ycoord, false, 0)
 			planets = append(planets, &p0)
 		}
 	}
