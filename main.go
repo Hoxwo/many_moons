@@ -8,7 +8,7 @@ import "time"
 import "image"
 import "sort"
 import planet "many_moons/planet"
-//import ship "many_moons/ship"
+import ship "many_moons/ship"
 import civilization "many_moons/civilization"
 import ui "github.com/gizak/termui/v3"
 import "github.com/gizak/termui/v3/widgets"
@@ -26,6 +26,9 @@ func main() {
 	selectedplanet := 0
 	centerofmapx := 0
  	centerofmapy := 0
+
+	//array of ships
+	ships := make([]*ship.Ship, 0)	
 
 	//All colors
 	//termui.ColorCyan
@@ -225,6 +228,7 @@ func main() {
 				}
 				//TO DO render satellites here
 				//TO DO render ships here as lines between planets
+				sendShip("Balanced", "Warlike", planets, ships)
 			}	
 			planetmap.BorderStyle.Fg = ui.ColorWhite
 
@@ -420,16 +424,16 @@ func GenerateSpace(planets []*planet.Planet, centerofmapx int, centerofmapy int)
 		}
 	
 		if(planettype == 1) {
-			p0 := planet.New("ST", "o",   1, "", "Small Terrestrial", xcoord, ycoord, false, 0)
+			p0 := planet.New(fmt.Sprintf("%s%d","ST ", i), "o",   1, "", "Small Terrestrial", xcoord, ycoord, false, 0)
 			planets = append(planets, &p0)
 		} else if(planettype == 2) {
-			p0 := planet.New("LT", "O",   2, "", "Large Terrestrial", xcoord, ycoord, false, 0)
+			p0 := planet.New(fmt.Sprintf("%s%d","LT ", i), "O",   2, "", "Large Terrestrial", xcoord, ycoord, false, 0)
 			planets = append(planets, &p0)		
 		} else if(planettype == 3) {
-			p0 := planet.New("IG", "(o)",   2, "", "Ice Giant", xcoord, ycoord, false, 0)
+			p0 := planet.New(fmt.Sprintf("%s%d","IG ", i), "(o)",   2, "", "Ice Giant", xcoord, ycoord, false, 0)
 			planets = append(planets, &p0)
 		} else {
-			p0 := planet.New("GG", "(O)",   3, "", "Gas Giant", xcoord, ycoord, false, 0)
+			p0 := planet.New(fmt.Sprintf("%s%d","GG ", i), "(O)",   3, "", "Gas Giant", xcoord, ycoord, false, 0)
 			planets = append(planets, &p0)
 		}
 	}
@@ -444,13 +448,13 @@ func GenerateSpace(planets []*planet.Planet, centerofmapx int, centerofmapy int)
 	for _, x := range xcoordsused {
 		totalx += x
 	}
-	centerofmapx = math.Floor(totalx/16)
+	centerofmapx = int(math.Floor(float64(totalx/16)))
 
 	totaly := 0
         for _, y := range ycoordsused {
                 totaly += y
         }
-	centerofmapy = math.Floor(totaly/16)	
+	centerofmapy = int(math.Floor(float64(totaly/16)))	
 
 	return planets
 }
@@ -495,5 +499,49 @@ func findCivilizationColorByName(searchname string, civilizations []*civilizatio
 	}
 	
 	return "ERROR"
+}
+
+func findCivilizationBasePlanetByName(searchname string, planets []*planet.Planet) string {
+	for _, p := range planets {
+		if(p.Occupied() == searchname && p.Homeplanet() == true) {
+			return p.Name()
+		}
+	}
+	
+	return "ERROR"
+}
+
+
+func findPlanetXcoordByName(searchname string, planets []*planet.Planet) int {
+	for _, p := range planets {
+		if(p.Name() == searchname) {
+			return p.Xcoord()
+		}
+	}
+	
+	return -7
+}
+
+func findPlanetYcoordByName(searchname string,  planets []*planet.Planet) int {
+	for _, p := range planets {
+		if(p.Name() == searchname) {
+			return p.Ycoord()
+		}
+	}
+	
+	return -7
+}
+
+func sendShip(civilizationfromname string, civilizationtoname string, planets []*planet.Planet, ships []*ship.Ship) {
+	//{civilization, speed, startx, starty, endx, endy, currentx, currenty}
+	s0 := ship.New("civilizationfromname", 2, 
+			findPlanetXcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets), 
+			findPlanetYcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets),
+			findPlanetXcoordByName(findCivilizationBasePlanetByName(civilizationtoname, planets),  planets), 
+			findPlanetYcoordByName(findCivilizationBasePlanetByName(civilizationtoname, planets), planets), 
+			0, 
+			0)
+			ships = append(ships, &s0)		
+
 }
 
