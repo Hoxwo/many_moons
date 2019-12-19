@@ -44,10 +44,10 @@ func main() {
 
 	// set up civilizations
 	// {name, color, atk, def, nav, gov, tec, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
-	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 30, 1, 2, -1)
-	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 0, 30, 30, 0, 0, 0)
-	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 0, 30, 30, 0, 0, 0)
-	c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 1, 1, 0, 30, 30, 0, 0, 0)
+	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 10, 1, 2, -1)
+	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
+	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
+	c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 1, 1, 0, 30, 10, 0, 0, 0)
 	//c4 := civilization.New("Autocracy",  "blue",    2, 1, 2, 3, 1, 2, 1, 1, 30, 30, 0, 0, 0)
 	//c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)				
 
@@ -140,7 +140,7 @@ func main() {
 
 	selectplanetinfopane := widgets.NewParagraph()
 	selectplanetinfopane.Title = "Planet Info"
-	selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet)
+	selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships)
 	selectplanetinfopane.SetRect(78, 19, 116, 34)
 	selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 
@@ -164,11 +164,20 @@ func main() {
 				if(selectedplanet < 15) {
 					selectedplanet++
 				}
+			case "s":
+				if(civilizations[0].Shipsavailable() > 0) {
+					civilizations[0].SetShipsavailable(civilizations[0].Shipsavailable() - 1)
+					newship := sendShip(civilizations[0].Name(), planets[selectedplanet].Name(), planets)
+					ships = append(ships, &newship)
+				}
+				
 			}
 		case <-ticker:
-			if(tickerCount % 400 == 1) {
+			if(tickerCount % 100 == 1) {
 				currentyear = currentyear + 1
 				EveryCivilizationCountdown(civilizations)
+				advanceAllShips(ships, planets, civilizations)
+				advanceColonizing(planets)
 			}
 			
 			//render map and stat panes
@@ -219,6 +228,11 @@ func main() {
 						planetmap.SetPoint(pt2, ui.ColorGreen)
 						planetmap.SetPoint(pt3, ui.ColorGreen)
 						planetmap.SetPoint(pt4, ui.ColorGreen)	
+					} else if(planets[i].Colonizing() == true) {
+						planetmap.SetPoint(pt1, ui.ColorBlue)
+						planetmap.SetPoint(pt2, ui.ColorBlue)
+						planetmap.SetPoint(pt3, ui.ColorBlue)
+						planetmap.SetPoint(pt4, ui.ColorBlue)	
 					} 
 				} else {
 					planetmap.SetPoint(pt1, ui.ColorWhite)
@@ -226,10 +240,22 @@ func main() {
 					planetmap.SetPoint(pt3, ui.ColorWhite)
 					planetmap.SetPoint(pt4, ui.ColorWhite)	
 				}
+			}
 				//TO DO render satellites here
 				//TO DO render ships here as lines between planets
-				sendShip("Balanced", "Warlike", planets, ships)
-			}	
+				for i := 0; i < len(ships); i++ {
+					shippt1 := image.Pt(((ships[i].Currentx())-2), ((ships[i].Currenty())-2))
+					shippt2 := image.Pt(((ships[i].Currentx())+2), ((ships[i].Currenty())+2))	
+					if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "cyan") {
+						planetmap.SetLine(shippt1, shippt2, ui.ColorCyan)	
+					} else if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "red") {
+						planetmap.SetLine(shippt1, shippt2, ui.ColorRed)	
+					} else if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "magenta") {
+						planetmap.SetLine(shippt1, shippt2, ui.ColorMagenta)	
+					} else if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "green") {
+						planetmap.SetLine(shippt1, shippt2, ui.ColorGreen)	
+					}		
+				}
 			planetmap.BorderStyle.Fg = ui.ColorWhite
 
 			civstatspane := widgets.NewParagraph()
@@ -252,7 +278,7 @@ func main() {
 
 			selectplanetinfopane := widgets.NewParagraph()
 			selectplanetinfopane.Title = "Planet Info"
-			selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet)
+			selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships)
 			selectplanetinfopane.SetRect(78, 19, 116, 34)
 			selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 			//	
@@ -364,7 +390,7 @@ func PlayerCivilizationStatsText(civilizations []*civilization.Civilization) str
 	return playercivstatstext
 }
 
-func SelectedPlanetText(planets []*planet.Planet, selectedplanet int) string {
+func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*ship.Ship) string {
 	name := planets[selectedplanet].Name()
 	planettype := planets[selectedplanet].Planettype()
 	occupied := planets[selectedplanet].Occupied()
@@ -378,6 +404,11 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int) string {
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet resource value: %d", resources)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet coordinates: (%d,%d)", xcoord, ycoord)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nDistance from your base planet: 0") //TO DO
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nNumber ships on map: %d", len(ships)) //TO DO
+	if(len(ships) > 0) {
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nShip x coord: %d", ships[0].Currentx()) //TO DO
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nShip y coord: %d", ships[0].Currenty()) //TO DO
+	}
 	if(planettype == "Ice Giant") {
 		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV or TEC level 4 required](fg:red)")
 		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[to colonize this planet](fg:red)")
@@ -388,8 +419,6 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int) string {
 		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
 		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")	
 	}
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[<, >] to select planet")
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[s] to send ship")
@@ -424,16 +453,16 @@ func GenerateSpace(planets []*planet.Planet, centerofmapx int, centerofmapy int)
 		}
 	
 		if(planettype == 1) {
-			p0 := planet.New(fmt.Sprintf("%s%d","ST ", i), "o",   1, "", "Small Terrestrial", xcoord, ycoord, false, 0)
+			p0 := planet.New(fmt.Sprintf("%s%d","ST ", i), "o",   1, "", "Small Terrestrial", xcoord, ycoord, false, 0, false)
 			planets = append(planets, &p0)
 		} else if(planettype == 2) {
-			p0 := planet.New(fmt.Sprintf("%s%d","LT ", i), "O",   2, "", "Large Terrestrial", xcoord, ycoord, false, 0)
+			p0 := planet.New(fmt.Sprintf("%s%d","LT ", i), "O",   2, "", "Large Terrestrial", xcoord, ycoord, false, 0, false)
 			planets = append(planets, &p0)		
 		} else if(planettype == 3) {
-			p0 := planet.New(fmt.Sprintf("%s%d","IG ", i), "(o)",   2, "", "Ice Giant", xcoord, ycoord, false, 0)
+			p0 := planet.New(fmt.Sprintf("%s%d","IG ", i), "(o)",   2, "", "Ice Giant", xcoord, ycoord, false, 0, false)
 			planets = append(planets, &p0)
 		} else {
-			p0 := planet.New(fmt.Sprintf("%s%d","GG ", i), "(O)",   3, "", "Gas Giant", xcoord, ycoord, false, 0)
+			p0 := planet.New(fmt.Sprintf("%s%d","GG ", i), "(O)",   3, "", "Gas Giant", xcoord, ycoord, false, 0, false)
 			planets = append(planets, &p0)
 		}
 	}
@@ -501,6 +530,16 @@ func findCivilizationColorByName(searchname string, civilizations []*civilizatio
 	return "ERROR"
 }
 
+func findCivilizationTimeToColonizeByName(searchname string, civilizations []*civilization.Civilization) int {
+	for _, c := range civilizations {
+		if(c.Name() == searchname) {
+			return c.Colonizationtime()
+		}
+	}
+	
+	return -7
+}
+
 func findCivilizationBasePlanetByName(searchname string, planets []*planet.Planet) string {
 	for _, p := range planets {
 		if(p.Occupied() == searchname && p.Homeplanet() == true) {
@@ -532,16 +571,100 @@ func findPlanetYcoordByName(searchname string,  planets []*planet.Planet) int {
 	return -7
 }
 
-func sendShip(civilizationfromname string, civilizationtoname string, planets []*planet.Planet, ships []*ship.Ship) {
-	//{civilization, speed, startx, starty, endx, endy, currentx, currenty}
-	s0 := ship.New("civilizationfromname", 2, 
-			findPlanetXcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets), 
-			findPlanetYcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets),
-			findPlanetXcoordByName(findCivilizationBasePlanetByName(civilizationtoname, planets),  planets), 
-			findPlanetYcoordByName(findCivilizationBasePlanetByName(civilizationtoname, planets), planets), 
-			0, 
-			0)
-			ships = append(ships, &s0)		
-
+func findPlanetByCoords(xcoord int, ycoord int, planets []*planet.Planet) string {
+	for _, p := range planets {
+		if(p.Xcoord() == xcoord && p.Ycoord() == ycoord) {
+			return p.Name()
+		}
+	}
+	
+	return "ERROR"
 }
 
+func sendShip(civilizationfromname string, planettoname string, planets []*planet.Planet) ship.Ship {
+	return ship.New(civilizationfromname, 10, 
+		findPlanetXcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets), 
+		findPlanetYcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets),
+		findPlanetXcoordByName(planettoname,  planets), 
+		findPlanetYcoordByName(planettoname, planets), 
+		findPlanetXcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets), 
+		findPlanetYcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets))		
+}
+
+func advanceAllShips(ships []*ship.Ship, planets []*planet.Planet, civilizations []*civilization.Civilization) {
+
+	for _, s := range ships { 
+		//if advancing, -1 from x or y each time
+		if(willShipAdvance(s.Speed()) == true) {
+			rollforxory := random(1,3)
+			if(rollforxory == 1 && s.Currentx() < s.Endx() || (s.Currenty() == s.Endy() && s.Currentx() > s.Endx())) {
+				s.SetCurrentx(s.Currentx() + 1)
+			} else if(rollforxory == 1 && s.Currentx() > s.Endx() || (s.Currenty() == s.Endy() && s.Currentx() > s.Endx())) {
+				s.SetCurrentx(s.Currentx() - 1)
+			} else if(rollforxory == 2 && s.Currenty() < s.Endy() || (s.Currentx() == s.Endx() && s.Currenty() < s.Endy())) {
+				s.SetCurrenty(s.Currenty() + 1)
+			} else if(rollforxory == 2 && s.Currenty() > s.Endy() || (s.Currentx() == s.Endx() && s.Currenty() > s.Endy())) {
+				s.SetCurrenty(s.Currenty() - 1)
+			}
+		}
+
+		if(s.Currentx() == s.Endx() && s.Currenty() == s.Endy()) {
+			landShip(s, ships, planets, civilizations)
+		}
+	}
+}
+
+func willShipAdvance(speed int) bool {
+	//get number from 1 to 10
+	rolltomove := random(1,11)
+
+	//ship speed determines chance to move. speed of 10 means move every time, speed of 1 means 1/10 chance to move
+	if(rolltomove <= speed) {
+		return true
+	}
+
+	return false
+}
+
+func landShip(s *ship.Ship, ships []*ship.Ship, planets []*planet.Planet, civilizations []*civilization.Civilization) {
+	planetname := findPlanetByCoords(s.Endx(), s.Endy(), planets)
+	colonize(s.Civilization(), planetname, planets, civilizations)
+	attack(planetname, planets)
+	deleteShipFromList(s, ships)
+}
+
+func colonize(civilizationname string, planetname string, planets []*planet.Planet, civilizations []*civilization.Civilization) { 
+	for i, p := range planets {
+		if(p.Name() == planetname) {
+			updatedplanet := planet.New(p.Name(), p.Appearance(),   p.Resources(), civilizationname, p.Planettype(), p.Xcoord(), p.Ycoord(), 							    false, findCivilizationTimeToColonizeByName(civilizationname, civilizations), true)
+			p = &updatedplanet
+			planets[i] = p
+		}
+	}
+}	
+
+func advanceColonizing(planets []*planet.Planet) { 
+	for i, p := range planets {
+		if(p.Timetocolonize() == 0) {
+			updatedplanet := planet.New(p.Name(), p.Appearance(),   p.Resources(), p.Occupied(), p.Planettype(), p.Xcoord(), p.Ycoord(), 							    false, 0, false)
+			p = &updatedplanet
+			planets[i] = p
+		} else {
+			p.SetTimetocolonize(p.Timetocolonize() - 1)
+		}
+	}
+}
+
+func attack(planetname string, planets []*planet.Planet) {
+	//to be implemented
+}	
+
+func deleteShipFromList(s *ship.Ship, ships []*ship.Ship) {
+	revisedships := make([]*ship.Ship, 0)
+	for _, shipinlist := range ships {
+		if shipinlist.Endy() != s.Endy() && shipinlist.Endx() != shipinlist.Endx() {
+			revisedships = append(revisedships, shipinlist)
+		}
+	}
+	ships = revisedships
+}
