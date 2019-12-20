@@ -175,12 +175,13 @@ func main() {
 				
 			}
 		case <-ticker:
-			if(tickerCount % 10 == 1) {
-				currentyear = currentyear + 1
-				EveryCivilizationCountdown(civilizations)
-				advanceAllShips(ships, planets, civilizations)
-				advanceColonizing(planets)
-			}
+			if(tickerCount % 100 == 1) {
+				if(tickerCount % 400 == 1) {
+					currentyear = currentyear + 1
+					EveryCivilizationCountdown(civilizations)
+					advanceAllShips(ships, planets, civilizations)
+					advanceColonizing(planets)
+				}
 			
 			//render map and stat panes
 			planetmapframe := widgets.NewParagraph()
@@ -219,32 +220,205 @@ func main() {
 					planetmap.SetPoint(pt1, ui.ColorCyan)
 					planetmap.SetPoint(pt2, ui.ColorCyan)
 					planetmap.SetPoint(pt3, ui.ColorCyan)
-					planetmap.SetPoint(pt4, ui.ColorCyan)	
+					planetmap.SetPoint(pt4, ui.ColorCyan)
+					
+					//satellites
+					satellitenumber := 0
+					if(planets[i].Homeplanet() == true) {
+						satellitenumber = 1
+					}
+					
+					deflevel := findCivilizationDEFByName(planets[i].Occupied(), civilizations)
+					if(deflevel <= 1 || deflevel == 2) {
+						satellitenumber += 1		
+					} else if(deflevel == 3 || deflevel == 4) {
+						satellitenumber += 2		
+					} else if(deflevel == 5 || deflevel == 6) {
+						satellitenumber += 3		
+					} else if(deflevel == 7 || deflevel == 8) {
+						satellitenumber += 4		
+					} else {
+						satellitenumber += 5
+					}
+				
+					xcoordsused := make([]int, 0)
+					ycoordsused := make([]int, 0) 
+					for ii := 0; ii < satellitenumber; ii++ {
+						xcoord := 0
+						for xcoord == 0 || contains(xcoordsused, xcoord) {
+							xcoord = random(planets[i].Xcoord() - 2,planets[i].Xcoord() + 3)
+							if(contains(xcoordsused, xcoord) == false) {
+								xcoordsused = append(xcoordsused, xcoord)
+								break
+							}		
+						}
+							
+						ycoord := 0
+						for ycoord == 0 || contains(ycoordsused, ycoord) {
+							ycoord = random(planets[i].Ycoord() - 2, planets[i].Ycoord() + 4)
+							if(contains(ycoordsused, ycoord) == false) {
+								ycoordsused = append(ycoordsused, ycoord)
+								break
+							}		
+						}
+						satpt := image.Pt((xcoord*2), (ycoord*4))
+						planetmap.SetPoint(satpt, ui.ColorCyan)
+					}	
 				} else if(planets[i].Colonizing() == false && findCivilizationColorByName(planets[i].Occupied(), civilizations) == "red") {
 					planetmap.SetPoint(pt1, ui.ColorRed)
 					planetmap.SetPoint(pt2, ui.ColorRed)
 					planetmap.SetPoint(pt3, ui.ColorRed)
-					planetmap.SetPoint(pt4, ui.ColorRed)	
+					planetmap.SetPoint(pt4, ui.ColorRed)
+
+					//satellites
+					satellitenumber := 0
+					if(planets[i].Homeplanet() == true) {
+						satellitenumber = 1
+					}
+					
+					deflevel := findCivilizationDEFByName(planets[i].Occupied(), civilizations)
+					if(deflevel <= 1 || deflevel == 2) {
+						satellitenumber += 1		
+					} else if(deflevel == 3 || deflevel == 4) {
+						satellitenumber += 2		
+					} else if(deflevel == 5 || deflevel == 6) {
+						satellitenumber += 3		
+					} else if(deflevel == 7 || deflevel == 8) {
+						satellitenumber += 4		
+					} else {
+						satellitenumber += 5
+					}
+				
+					xcoordsused := make([]int, 0)
+					ycoordsused := make([]int, 0) 
+					for ii := 0; ii < satellitenumber; ii++ {
+						xcoord := 0
+						for xcoord == 0 || contains(xcoordsused, xcoord) {
+							xcoord = random(planets[i].Xcoord() - 2,planets[i].Xcoord() + 3)
+							if(contains(xcoordsused, xcoord) == false) {
+								xcoordsused = append(xcoordsused, xcoord)
+								break
+							}		
+						}
+							
+						ycoord := 0
+						for ycoord == 0 || contains(ycoordsused, ycoord) {
+							ycoord = random(planets[i].Ycoord() - 2, planets[i].Ycoord() + 4)
+							if(contains(ycoordsused, ycoord) == false) {
+								ycoordsused = append(ycoordsused, ycoord)
+								break
+							}		
+						}
+						satpt := image.Pt((xcoord*2), (ycoord*4))
+						planetmap.SetPoint(satpt, ui.ColorRed)
+					}
+	
 				} else if(planets[i].Colonizing() == false && findCivilizationColorByName(planets[i].Occupied(), civilizations) == "magenta") {
 					planetmap.SetPoint(pt1, ui.ColorMagenta)
 					planetmap.SetPoint(pt2, ui.ColorMagenta)
 					planetmap.SetPoint(pt3, ui.ColorMagenta)
-					planetmap.SetPoint(pt4, ui.ColorMagenta)	
+					planetmap.SetPoint(pt4, ui.ColorMagenta)
+					
+					//satellites
+					satellitenumber := 0
+					if(planets[i].Homeplanet() == true) {
+						satellitenumber = 1
+					}
+					
+					deflevel := findCivilizationDEFByName(planets[i].Occupied(), civilizations)
+					if(deflevel <= 1 || deflevel == 2) {
+						satellitenumber += 1		
+					} else if(deflevel == 3 || deflevel == 4) {
+						satellitenumber += 2		
+					} else if(deflevel == 5 || deflevel == 6) {
+						satellitenumber += 3		
+					} else if(deflevel == 7 || deflevel == 8) {
+						satellitenumber += 4		
+					} else {
+						satellitenumber += 5
+					}
+				
+					xcoordsused := make([]int, 0)
+					ycoordsused := make([]int, 0) 
+					for ii := 0; ii < satellitenumber; ii++ {
+						xcoord := 0
+						for xcoord == 0 || contains(xcoordsused, xcoord) {
+							xcoord = random(planets[i].Xcoord() - 2,planets[i].Xcoord() + 3)
+							if(contains(xcoordsused, xcoord) == false) {
+								xcoordsused = append(xcoordsused, xcoord)
+								break
+							}		
+						}
+							
+						ycoord := 0
+						for ycoord == 0 || contains(ycoordsused, ycoord) {
+							ycoord = random(planets[i].Ycoord() - 2, planets[i].Ycoord() + 4)
+							if(contains(ycoordsused, ycoord) == false) {
+								ycoordsused = append(ycoordsused, ycoord)
+								break
+							}		
+						}
+						satpt := image.Pt((xcoord*2), (ycoord*4))
+						planetmap.SetPoint(satpt, ui.ColorMagenta)
+					}
+	
 				} else if(planets[i].Colonizing() == false && findCivilizationColorByName(planets[i].Occupied(), civilizations) == "green") {
 					planetmap.SetPoint(pt1, ui.ColorGreen)
 					planetmap.SetPoint(pt2, ui.ColorGreen)
 					planetmap.SetPoint(pt3, ui.ColorGreen)
 					planetmap.SetPoint(pt4, ui.ColorGreen)	
+					
+					//satellites
+					satellitenumber := 0
+					if(planets[i].Homeplanet() == true) {
+						satellitenumber = 1
+					}
+					
+					deflevel := findCivilizationDEFByName(planets[i].Occupied(), civilizations)
+					if(deflevel <= 1 || deflevel == 2) {
+						satellitenumber += 1		
+					} else if(deflevel == 3 || deflevel == 4) {
+						satellitenumber += 2		
+					} else if(deflevel == 5 || deflevel == 6) {
+						satellitenumber += 3		
+					} else if(deflevel == 7 || deflevel == 8) {
+						satellitenumber += 4		
+					} else {
+						satellitenumber += 5
+					}
+				
+					xcoordsused := make([]int, 0)
+					ycoordsused := make([]int, 0) 
+					for ii := 0; ii < satellitenumber; ii++ {
+						xcoord := 0
+						for xcoord == 0 || contains(xcoordsused, xcoord) {
+							xcoord = random(planets[i].Xcoord() - 2,planets[i].Xcoord() + 3)
+							if(contains(xcoordsused, xcoord) == false) {
+								xcoordsused = append(xcoordsused, xcoord)
+								break
+							}		
+						}
+							
+						ycoord := 0
+						for ycoord == 0 || contains(ycoordsused, ycoord) {
+							ycoord = random(planets[i].Ycoord() - 2, planets[i].Ycoord() + 4)
+							if(contains(ycoordsused, ycoord) == false) {
+								ycoordsused = append(ycoordsused, ycoord)
+								break
+							}		
+						}
+						satpt := image.Pt((xcoord*2), (ycoord*4))
+						planetmap.SetPoint(satpt, ui.ColorGreen)
+					}
 				}
 				} else {
 					planetmap.SetPoint(pt1, ui.ColorWhite)
 					planetmap.SetPoint(pt2, ui.ColorWhite)
 					planetmap.SetPoint(pt3, ui.ColorWhite)
 					planetmap.SetPoint(pt4, ui.ColorWhite)	
-				}
+				}	
 			}
-				//TO DO render satellites here
-				//TO DO render ships here as lines between planets
+				//ships
 				for i := 0; i < len(ships); i++ {
 					if(ships[i].Landed() == false) {
 						shippt1 := image.Pt(((ships[i].Currentx() * 2)), ((ships[i].Currenty()*4)))
@@ -288,6 +462,7 @@ func main() {
 			//	
 
 			ui.Render(planetmapframe, planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane)
+			}
 		}
 	}
 }
@@ -531,6 +706,16 @@ func findCivilizationColorByName(searchname string, civilizations []*civilizatio
 	}
 	
 	return "ERROR"
+}
+
+func findCivilizationDEFByName(searchname string, civilizations []*civilization.Civilization) int {
+	for _, c := range civilizations {
+		if(c.Name() == searchname) {
+			return c.Defense()
+		}
+	}
+	
+	return -7
 }
 
 func findCivilizationTimeToColonizeByName(searchname string, civilizations []*civilization.Civilization) int {

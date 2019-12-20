@@ -15,15 +15,17 @@
 
 --DEF stat - base planet treated as 1 higher DEF, always has an asterisk satellite around it
 --DEF satellites appear at different DEF levels
-    -- level 2 - 2 surrounding dots
-    -- level 3 - 3 surrounding dots
-    -- level 4 - 4 surrounding dots
-    -- level 5 - 4 surrounding dots, 1 asterisk 
-    -- level 6 - 5 surrounding dots, 1 asterisk
-    -- level 7 - 6 surrounding dots, 1 asterisk
-    -- level 8 - 6 surrounding dots, 2 asterisk 
-    -- level 9 - 7 surrounding dots, 2 asterisk 
-    -- level 10 - 7 surrounding dots, 3 asterisk  
+--Home planets will always get +1 satellite
+    -- level 1 - 1 surrounding dot
+    -- level 2 - 1 surrounding dot
+    -- level 3 - 2 surrounding dots
+    -- level 4 - 2 surrounding dots
+    -- level 5 - 3 surrounding dots
+    -- level 6 - 3 surrounding dots
+    -- level 7 - 4 surrounding dots
+    -- level 8 - 4 surrounding dots
+    -- level 9 - 5 surrounding dots
+    -- level 10 - 5 surrounding dots  
 
 --Ships
     -- Ships are an arrow in the direction they travel ( ^ , > , v , < )
