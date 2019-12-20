@@ -8,11 +8,12 @@ type Ship struct {
     endx int
     endy int
     currentx int
-    currenty int	
+    currenty int
+    landed bool	
 }
 
-func New(civilization string, speed int, startx int, starty int, endx int, endy int, currentx int, currenty int) Ship {
-    s := Ship {civilization, speed, startx, starty, endx, endy, currentx, currenty}
+func New(civilization string, speed int, startx int, starty int, endx int, endy int, currentx int, currenty int, landed bool) Ship {
+    s := Ship {civilization, speed, startx, starty, endx, endy, currentx, currenty, landed}
     return s
 }
 
@@ -78,4 +79,12 @@ func (s *Ship) SetCurrenty(currenty int) {
 
 func (s Ship) Currenty() int {
     return s.currenty
+}
+
+func (s *Ship) SetLanded(landed bool) {
+    s.landed = landed
+}
+
+func (s Ship) Landed() bool {
+    return s.landed
 }

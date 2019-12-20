@@ -62,7 +62,8 @@ func main() {
 			planetnumber = random(1,16)
 			if(contains(usedplanets, planetnumber) == false) {
 				usedplanets = append(usedplanets, planetnumber)
-				planets[planetnumber].SetHomeplanet(true)
+				homeplanet := true
+				planets[planetnumber].SetHomeplanet(homeplanet)
 				planets[planetnumber].SetOccupied(c.Name())
 				break
 			}		
@@ -167,13 +168,14 @@ func main() {
 			case "s":
 				if(civilizations[0].Shipsavailable() > 0) {
 					civilizations[0].SetShipsavailable(civilizations[0].Shipsavailable() - 1)
-					newship := sendShip(civilizations[0].Name(), planets[selectedplanet].Name(), planets)
+					planetfromname := findCivilizationBasePlanetByName(civilizations[0].Name(), planets)
+					newship := sendShip(civilizations[0].Name(), planetfromname, planets[selectedplanet].Name(), planets)
 					ships = append(ships, &newship)
 				}
 				
 			}
 		case <-ticker:
-			if(tickerCount % 100 == 1) {
+			if(tickerCount % 10 == 1) {
 				currentyear = currentyear + 1
 				EveryCivilizationCountdown(civilizations)
 				advanceAllShips(ships, planets, civilizations)
@@ -208,32 +210,32 @@ func main() {
 				pt3 := image.Pt(((planets[i].Xcoord()*2)+0), ((planets[i].Ycoord()*4)+1))
 				pt4 := image.Pt(((planets[i].Xcoord()*2)+1), ((planets[i].Ycoord()*4)+1))
 				if(len(planets[i].Occupied()) > 0) {
-					if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "cyan") {
-						planetmap.SetPoint(pt1, ui.ColorCyan)
-						planetmap.SetPoint(pt2, ui.ColorCyan)
-						planetmap.SetPoint(pt3, ui.ColorCyan)
-						planetmap.SetPoint(pt4, ui.ColorCyan)	
-					} else if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "red") {
-						planetmap.SetPoint(pt1, ui.ColorRed)
-						planetmap.SetPoint(pt2, ui.ColorRed)
-						planetmap.SetPoint(pt3, ui.ColorRed)
-						planetmap.SetPoint(pt4, ui.ColorRed)	
-					} else if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "magenta") {
-						planetmap.SetPoint(pt1, ui.ColorMagenta)
-						planetmap.SetPoint(pt2, ui.ColorMagenta)
-						planetmap.SetPoint(pt3, ui.ColorMagenta)
-						planetmap.SetPoint(pt4, ui.ColorMagenta)	
-					} else if(findCivilizationColorByName(planets[i].Occupied(), civilizations) == "green") {
-						planetmap.SetPoint(pt1, ui.ColorGreen)
-						planetmap.SetPoint(pt2, ui.ColorGreen)
-						planetmap.SetPoint(pt3, ui.ColorGreen)
-						planetmap.SetPoint(pt4, ui.ColorGreen)	
-					} else if(planets[i].Colonizing() == true) {
-						planetmap.SetPoint(pt1, ui.ColorBlue)
-						planetmap.SetPoint(pt2, ui.ColorBlue)
-						planetmap.SetPoint(pt3, ui.ColorBlue)
-						planetmap.SetPoint(pt4, ui.ColorBlue)	
-					} 
+				if(planets[i].Colonizing() == true) {
+					planetmap.SetPoint(pt1, ui.ColorBlue)
+					planetmap.SetPoint(pt2, ui.ColorBlue)
+					planetmap.SetPoint(pt3, ui.ColorBlue)
+					planetmap.SetPoint(pt4, ui.ColorBlue)	
+				} else if(planets[i].Colonizing() == false && findCivilizationColorByName(planets[i].Occupied(), civilizations) == "cyan") {
+					planetmap.SetPoint(pt1, ui.ColorCyan)
+					planetmap.SetPoint(pt2, ui.ColorCyan)
+					planetmap.SetPoint(pt3, ui.ColorCyan)
+					planetmap.SetPoint(pt4, ui.ColorCyan)	
+				} else if(planets[i].Colonizing() == false && findCivilizationColorByName(planets[i].Occupied(), civilizations) == "red") {
+					planetmap.SetPoint(pt1, ui.ColorRed)
+					planetmap.SetPoint(pt2, ui.ColorRed)
+					planetmap.SetPoint(pt3, ui.ColorRed)
+					planetmap.SetPoint(pt4, ui.ColorRed)	
+				} else if(planets[i].Colonizing() == false && findCivilizationColorByName(planets[i].Occupied(), civilizations) == "magenta") {
+					planetmap.SetPoint(pt1, ui.ColorMagenta)
+					planetmap.SetPoint(pt2, ui.ColorMagenta)
+					planetmap.SetPoint(pt3, ui.ColorMagenta)
+					planetmap.SetPoint(pt4, ui.ColorMagenta)	
+				} else if(planets[i].Colonizing() == false && findCivilizationColorByName(planets[i].Occupied(), civilizations) == "green") {
+					planetmap.SetPoint(pt1, ui.ColorGreen)
+					planetmap.SetPoint(pt2, ui.ColorGreen)
+					planetmap.SetPoint(pt3, ui.ColorGreen)
+					planetmap.SetPoint(pt4, ui.ColorGreen)	
+				}
 				} else {
 					planetmap.SetPoint(pt1, ui.ColorWhite)
 					planetmap.SetPoint(pt2, ui.ColorWhite)
@@ -244,17 +246,19 @@ func main() {
 				//TO DO render satellites here
 				//TO DO render ships here as lines between planets
 				for i := 0; i < len(ships); i++ {
-					shippt1 := image.Pt(((ships[i].Currentx())-2), ((ships[i].Currenty())-2))
-					shippt2 := image.Pt(((ships[i].Currentx())+2), ((ships[i].Currenty())+2))	
-					if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "cyan") {
-						planetmap.SetLine(shippt1, shippt2, ui.ColorCyan)	
-					} else if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "red") {
-						planetmap.SetLine(shippt1, shippt2, ui.ColorRed)	
-					} else if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "magenta") {
-						planetmap.SetLine(shippt1, shippt2, ui.ColorMagenta)	
-					} else if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "green") {
-						planetmap.SetLine(shippt1, shippt2, ui.ColorGreen)	
-					}		
+					if(ships[i].Landed() == false) {
+						shippt1 := image.Pt(((ships[i].Currentx() * 2)), ((ships[i].Currenty()*4)))
+						shippt2 := image.Pt(((ships[i].Currentx() * 2) + 2), ((ships[i].Currenty()*4) + 2))	
+						if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "cyan") {
+							planetmap.SetLine(shippt1, shippt2, ui.ColorCyan)	
+						} else if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "red") {
+							planetmap.SetLine(shippt1, shippt2, ui.ColorRed)	
+						} else if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "magenta") {
+							planetmap.SetLine(shippt1, shippt2, ui.ColorMagenta)	
+						} else if(findCivilizationColorByName(ships[i].Civilization(), civilizations) == "green") {
+							planetmap.SetLine(shippt1, shippt2, ui.ColorGreen)	
+						}		
+					}
 				}
 			planetmap.BorderStyle.Fg = ui.ColorWhite
 
@@ -400,14 +404,14 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*s
 	selectedPlanetText := ""
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("Planet name: %s", name)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet type: %s", planettype)
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet occupied by: %s", occupied)
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet occupied by: %s, \ntime to col: %d, col: %t", occupied, planets[selectedplanet].Timetocolonize(), planets[selectedplanet].Colonizing())
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet resource value: %d", resources)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet coordinates: (%d,%d)", xcoord, ycoord)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nDistance from your base planet: 0") //TO DO
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nNumber ships on map: %d", len(ships)) //TO DO
 	if(len(ships) > 0) {
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nShip x coord: %d", ships[0].Currentx()) //TO DO
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nShip y coord: %d", ships[0].Currenty()) //TO DO
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nShip x coord: %d", ((ships[0].Currentx() * 2) - 2)) //TO DO
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nShip y coord: %d", ((ships[0].Currenty()*4) - 2)) //TO DO
 	}
 	if(planettype == "Ice Giant") {
 		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV or TEC level 4 required](fg:red)")
@@ -419,7 +423,6 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*s
 		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
 		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")	
 	}
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[<, >] to select planet")
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[s] to send ship")
 
@@ -581,14 +584,15 @@ func findPlanetByCoords(xcoord int, ycoord int, planets []*planet.Planet) string
 	return "ERROR"
 }
 
-func sendShip(civilizationfromname string, planettoname string, planets []*planet.Planet) ship.Ship {
+func sendShip(civilizationfromname string, planetfromname string, planettoname string, planets []*planet.Planet) ship.Ship {
 	return ship.New(civilizationfromname, 10, 
-		findPlanetXcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets), 
-		findPlanetYcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets),
+		findPlanetXcoordByName(planetfromname,  planets), 
+		findPlanetYcoordByName(planetfromname,  planets),
 		findPlanetXcoordByName(planettoname,  planets), 
 		findPlanetYcoordByName(planettoname, planets), 
-		findPlanetXcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets), 
-		findPlanetYcoordByName(findCivilizationBasePlanetByName(civilizationfromname, planets), planets))		
+		findPlanetXcoordByName(planetfromname,  planets), 
+		findPlanetYcoordByName(planetfromname,  planets),
+		false)		
 }
 
 func advanceAllShips(ships []*ship.Ship, planets []*planet.Planet, civilizations []*civilization.Civilization) {
@@ -597,7 +601,7 @@ func advanceAllShips(ships []*ship.Ship, planets []*planet.Planet, civilizations
 		//if advancing, -1 from x or y each time
 		if(willShipAdvance(s.Speed()) == true) {
 			rollforxory := random(1,3)
-			if(rollforxory == 1 && s.Currentx() < s.Endx() || (s.Currenty() == s.Endy() && s.Currentx() > s.Endx())) {
+			if(rollforxory == 1 && s.Currentx() < s.Endx() || (s.Currenty() == s.Endy() && s.Currentx() < s.Endx())) {
 				s.SetCurrentx(s.Currentx() + 1)
 			} else if(rollforxory == 1 && s.Currentx() > s.Endx() || (s.Currenty() == s.Endy() && s.Currentx() > s.Endx())) {
 				s.SetCurrentx(s.Currentx() - 1)
@@ -609,7 +613,10 @@ func advanceAllShips(ships []*ship.Ship, planets []*planet.Planet, civilizations
 		}
 
 		if(s.Currentx() == s.Endx() && s.Currenty() == s.Endy()) {
-			landShip(s, ships, planets, civilizations)
+			if(s.Landed() == false) {
+				landShip(s, ships, planets, civilizations)
+				s.SetLanded(true) 
+			}
 		}
 	}
 }
@@ -630,7 +637,6 @@ func landShip(s *ship.Ship, ships []*ship.Ship, planets []*planet.Planet, civili
 	planetname := findPlanetByCoords(s.Endx(), s.Endy(), planets)
 	colonize(s.Civilization(), planetname, planets, civilizations)
 	attack(planetname, planets)
-	deleteShipFromList(s, ships)
 }
 
 func colonize(civilizationname string, planetname string, planets []*planet.Planet, civilizations []*civilization.Civilization) { 
@@ -644,13 +650,14 @@ func colonize(civilizationname string, planetname string, planets []*planet.Plan
 }	
 
 func advanceColonizing(planets []*planet.Planet) { 
-	for i, p := range planets {
-		if(p.Timetocolonize() == 0) {
-			updatedplanet := planet.New(p.Name(), p.Appearance(),   p.Resources(), p.Occupied(), p.Planettype(), p.Xcoord(), p.Ycoord(), 							    false, 0, false)
-			p = &updatedplanet
-			planets[i] = p
-		} else {
-			p.SetTimetocolonize(p.Timetocolonize() - 1)
+	for _, p := range planets {
+		if(p.Occupied() != "" && p.Colonizing() == true) {
+			if(p.Timetocolonize() > 1) {
+				p.SetTimetocolonize(p.Timetocolonize() - 1)
+			} else {
+			 	p.SetColonizing(false)
+				p.SetTimetocolonize(0)
+			}
 		}
 	}
 }
@@ -658,13 +665,3 @@ func advanceColonizing(planets []*planet.Planet) {
 func attack(planetname string, planets []*planet.Planet) {
 	//to be implemented
 }	
-
-func deleteShipFromList(s *ship.Ship, ships []*ship.Ship) {
-	revisedships := make([]*ship.Ship, 0)
-	for _, shipinlist := range ships {
-		if shipinlist.Endy() != s.Endy() && shipinlist.Endx() != shipinlist.Endx() {
-			revisedships = append(revisedships, shipinlist)
-		}
-	}
-	ships = revisedships
-}
