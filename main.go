@@ -48,17 +48,17 @@ func main() {
 
 	// set up civilizations
 	// {name, color, atk, def, nav, gov, tec, base res, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
-	//c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 10, 1, 2, -1)
-	//c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
-	//c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
-	//c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 1, 1, 0, 30, 10, 0, 0, 0)
+	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 10, 1, 2, -1)
+	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
+	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
+	c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 2, 1, 1, 0, 30, 10, 0, 0, 0)
 	//c4 := civilization.New("Autocracy",  "blue",    2, 1, 2, 3, 1, 2, 1, 1, 30, 30, 0, 0, 0)
 	//c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)
 	//super powered version of the nations for testing				
-	c0 := civilization.New("Balanced",   "cyan",    8, 5, 5, 5, 5, 5, 5, 1, 3, 0, 20, 10, 1, 2, -1)
-	c1 := civilization.New("Warlike",    "red",     7, 6, 5, 5, 3, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
-	c2 := civilization.New("Defensive",  "magenta", 6, 7, 5, 5, 4, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
-	c3 := civilization.New("Explorer",   "green",   3, 4, 7, 6, 5, 5, 5, 1, 1, 0, 30, 10, 0, 0, 0)
+	//c0 := civilization.New("Balanced",   "cyan",    8, 5, 5, 5, 5, 5, 5, 1, 3, 0, 20, 10, 1, 2, -1)
+	//c1 := civilization.New("Warlike",    "red",     7, 6, 5, 5, 3, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
+	//c2 := civilization.New("Defensive",  "magenta", 6, 7, 5, 5, 4, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
+	//c3 := civilization.New("Explorer",   "green",   3, 4, 7, 6, 5, 5, 5, 1, 1, 0, 30, 10, 0, 0, 0)
 
 
 	//add them to master list
@@ -1000,7 +1000,7 @@ func attack(defenderplanetname string, attackername string, planets []*planet.Pl
 	difference := attackeratk - defenderdef
 
 	//attacker gets ATK rolls of 10 sided die and defender gets DEF+1 rolls
-	//attacker gets 2 additional rolls of die with guaranteed 10 if 3 levels above DEF
+	//attacker gets 1 additional roll of die with guaranteed 10 if 3 levels above DEF
 	//attacker has their resource value added
 	attacksum := 0
 	for i := 0; i < attackeratk; i++ {
