@@ -30,6 +30,14 @@ func main() {
 	//array of ships
 	ships := make([]*ship.Ship, 0)	
 
+	//array of messages
+	messageHistory := make([]string,0)
+	//save message
+		//if(strings.Compare(message,"") != 0) {
+//				messageHistory = append(messageHistory, message)
+//		}
+
+
 	//All colors
 	//termui.ColorCyan
 	//termui.ColorGreen
@@ -44,12 +52,18 @@ func main() {
 
 	// set up civilizations
 	// {name, color, atk, def, nav, gov, tec, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
-	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 10, 1, 2, -1)
-	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
-	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
-	c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 1, 1, 0, 30, 10, 0, 0, 0)
+	//c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 10, 1, 2, -1)
+	//c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
+	//c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
+	//c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 1, 1, 0, 30, 10, 0, 0, 0)
 	//c4 := civilization.New("Autocracy",  "blue",    2, 1, 2, 3, 1, 2, 1, 1, 30, 30, 0, 0, 0)
-	//c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)				
+	//c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)
+	//super powered version of the nations for testing				
+	c0 := civilization.New("Balanced",   "cyan",    5, 5, 5, 5, 5, 5, 1, 3, 0, 20, 10, 1, 2, -1)
+	c1 := civilization.New("Warlike",    "red",     7, 6, 5, 5, 3, 4, 1, 1, 0, 30, 10, 0, 0, 0)
+	c2 := civilization.New("Defensive",  "magenta", 6, 7, 5, 5, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
+	c3 := civilization.New("Explorer",   "green",   3, 4, 7, 6, 5, 5, 1, 1, 0, 30, 10, 0, 0, 0)
+
 
 	//add them to master list
 	civilizations = append(civilizations, &c0, &c1, &c2, &c3) //&c4, &c5)	
@@ -136,16 +150,31 @@ func main() {
 	playercivstatspane := widgets.NewParagraph()
 	playercivstatspane.Title = fmt.Sprintf("%s", civilizations[0].Name())
 	playercivstatspane.Text = PlayerCivilizationStatsText(civilizations)
-	playercivstatspane.SetRect(78, 14, 116, 19)
+	playercivstatspane.SetRect(78, 19, 116, 24)
 	playercivstatspane.BorderStyle.Fg = ui.ColorCyan
+
+	//messages for player
+	messages := widgets.NewList()	
+	if(len(messageHistory) == 0) {		
+		messages.Rows = make([]string,0)
+	} else if(len(messageHistory) < 3) {
+		messages.Rows = messageHistory[:len(messageHistory)]
+	} else {
+		messages.Rows = messageHistory[len(messageHistory)-3:len(messageHistory)]
+	}
+	messages.TextStyle = ui.NewStyle(ui.ColorWhite)
+	messages.WrapText = false
+	messages.BorderStyle.Fg = ui.ColorCyan
+	messages.Title = "Messages"
+	messages.SetRect(78, 19, 116, 24)
 
 	selectplanetinfopane := widgets.NewParagraph()
 	selectplanetinfopane.Title = "Planet Info"
 	selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships)
-	selectplanetinfopane.SetRect(78, 19, 116, 34)
+	selectplanetinfopane.SetRect(78, 24, 116, 34)
 	selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 
-	ui.Render(planetmapframe, planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane)
+	ui.Render(planetmapframe, planetmap, civstatspane, sliderspane, playercivstatspane, messages, selectplanetinfopane)
 
 	tickerCount := 0
 	uiEvents := ui.PollEvents()
@@ -171,6 +200,7 @@ func main() {
 					planetfromname := findCivilizationBasePlanetByName(civilizations[0].Name(), planets)
 					newship := sendShip(civilizations[0].Name(), planetfromname, planets[selectedplanet].Name(), planets)
 					ships = append(ships, &newship)
+					messageHistory = append(messageHistory, fmt.Sprintf("Ship sent to %s", planets[selectedplanet].Name()))
 				}
 				
 			}
@@ -454,14 +484,29 @@ func main() {
 			playercivstatspane.SetRect(78, 14, 116, 19)
 			playercivstatspane.BorderStyle.Fg = ui.ColorCyan
 
+			//messages for player
+			messages := widgets.NewList()	
+			if(len(messageHistory) == 0) {		
+				messages.Rows = make([]string,0)
+			} else if(len(messageHistory) < 3) {
+				messages.Rows = messageHistory[:len(messageHistory)]
+			} else {
+				messages.Rows = messageHistory[len(messageHistory)-3:len(messageHistory)]
+			}
+			messages.TextStyle = ui.NewStyle(ui.ColorWhite)
+			messages.WrapText = false
+			messages.BorderStyle.Fg = ui.ColorCyan
+			messages.Title = "Messages"
+			messages.SetRect(78, 19, 116, 24)
+
 			selectplanetinfopane := widgets.NewParagraph()
 			selectplanetinfopane.Title = "Planet Info"
 			selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships)
-			selectplanetinfopane.SetRect(78, 19, 116, 34)
+			selectplanetinfopane.SetRect(78, 24, 116, 34)
 			selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 			//	
 
-			ui.Render(planetmapframe, planetmap, civstatspane, sliderspane, playercivstatspane, selectplanetinfopane)
+			ui.Render(planetmapframe, planetmap, civstatspane, sliderspane, playercivstatspane, messages, selectplanetinfopane)
 			}
 		}
 	}
@@ -565,7 +610,6 @@ func PlayerCivilizationStatsText(civilizations []*civilization.Civilization) str
 	playercivstatstext := ""
 	playercivstatstext = playercivstatstext + fmt.Sprintf("%d/%d ships available", shipsavailable, maxshipsavailable)
 	playercivstatstext = playercivstatstext + fmt.Sprintf("\n%d years until next ship ready", (maxshiptimer - shiptimer))
-
 	return playercivstatstext
 }
 
@@ -579,28 +623,18 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*s
 	selectedPlanetText := ""
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("Planet name: %s", name)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet type: %s", planettype)
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet occupied by: %s, \ntime to col: %d, col: %t", occupied, planets[selectedplanet].Timetocolonize(), planets[selectedplanet].Colonizing())
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet occupied by: %s", occupied)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet resource value: %d", resources)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet coordinates: (%d,%d)", xcoord, ycoord)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nDistance from your base planet: 0") //TO DO
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nNumber ships on map: %d", len(ships)) //TO DO
-	if(len(ships) > 0) {
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nShip x coord: %d", ((ships[0].Currentx() * 2) - 2)) //TO DO
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nShip y coord: %d", ((ships[0].Currenty()*4) - 2)) //TO DO
-	}
 	if(planettype == "Ice Giant") {
-		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV or TEC level 4 required](fg:red)")
-		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[to colonize this planet](fg:red)")
+		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: 1](fg:blue) [TEC required: 4](fg:red) ")
 	} else if(planettype == "Gas Giant") {
-		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV or TEC level 7 required](fg:red)")
-		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[to colonize this planet](fg:red)")	
+		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: 1](fg:blue) [TEC required: 7](fg:red)")
 	} else {
-		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")
-		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n")	
+		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: 1](fg:blue)")	
 	}
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[<, >] to select planet")
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[s] to send ship")
-
+	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[<, >] scan [s] send ship")
 	return selectedPlanetText
 }
 
