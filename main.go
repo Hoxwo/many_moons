@@ -221,7 +221,10 @@ func main() {
 				if(tickerCount % 400 == 1) {
 					currentyear = currentyear + 1
 					EveryCivilizationCountdown(civilizations)
-					advanceAllShips(ships, planets, civilizations)
+					message := advanceAllShips(ships, planets, civilizations)
+					if(len(message) > 0) {
+						messageHistory = append(messageHistory, message)
+					}
 					advanceColonizing(planets)
 				}
 			
@@ -674,6 +677,7 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*s
 			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:red) [TEC required: 0](fg:blue)", navdistance )
 		}
 	}
+
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[<, >] scan [s] send ship")
 	return selectedPlanetText
 }
@@ -685,8 +689,8 @@ func GenerateSpace(planets []*planet.Planet, centerofmapx int, centerofmapy int)
 	for i := 0;  i <= numberplanets; i++ {
 		// 1 - small rocky planet, 2 - large rocky planet, 3 - ice giant, 4 - gas giant
 		planettype := random(1,5)
-		//first 5 planets are small terrestrial		
-		if(i < 5) {
+		// planets 2, 6, 9, 12  are small terrestrial		
+		if(i == 2 || i == 6 || i == 9 || i == 12) {
 			planettype = 1
 		}
 		
@@ -797,6 +801,16 @@ func findCivilizationDEFByName(searchname string, civilizations []*civilization.
 	return -7
 }
 
+func findCivilizationATKByName(searchname string, civilizations []*civilization.Civilization) int {
+	for _, c := range civilizations {
+		if(c.Name() == searchname) {
+			return c.Attack()
+		}
+	}
+	
+	return -7
+}
+
 func findCivilizationTimeToColonizeByName(searchname string, civilizations []*civilization.Civilization) int {
 	for _, c := range civilizations {
 		if(c.Name() == searchname) {
@@ -838,6 +852,16 @@ func findPlanetYcoordByName(searchname string,  planets []*planet.Planet) int {
 	return -7
 }
 
+func findPlanetOccupiedByName(searchname string,  planets []*planet.Planet) string {
+	for _, p := range planets {
+		if(p.Name() == searchname) {
+			return p.Occupied()
+		}
+	}
+	
+	return "ERROR"
+}
+
 func findPlanetByCoords(xcoord int, ycoord int, planets []*planet.Planet) string {
 	for _, p := range planets {
 		if(p.Xcoord() == xcoord && p.Ycoord() == ycoord) {
@@ -859,8 +883,7 @@ func sendShip(civilizationfromname string, planetfromname string, planettoname s
 		false)		
 }
 
-func advanceAllShips(ships []*ship.Ship, planets []*planet.Planet, civilizations []*civilization.Civilization) {
-
+func advanceAllShips(ships []*ship.Ship, planets []*planet.Planet, civilizations []*civilization.Civilization) string {
 	for _, s := range ships { 
 		//if advancing, -1 from x or y each time
 		if(willShipAdvance(s.Speed()) == true) {
@@ -876,13 +899,11 @@ func advanceAllShips(ships []*ship.Ship, planets []*planet.Planet, civilizations
 			}
 		}
 
-		if(s.Currentx() == s.Endx() && s.Currenty() == s.Endy()) {
-			if(s.Landed() == false) {
-				landShip(s, ships, planets, civilizations)
-				s.SetLanded(true) 
-			}
+		if(s.Currentx() == s.Endx() && s.Currenty() == s.Endy() && s.Landed() != true) {
+			return landShip(s, ships, planets, civilizations)
 		}
 	}
+	return ""
 }
 
 func willShipAdvance(speed int) bool {
@@ -897,10 +918,15 @@ func willShipAdvance(speed int) bool {
 	return false
 }
 
-func landShip(s *ship.Ship, ships []*ship.Ship, planets []*planet.Planet, civilizations []*civilization.Civilization) {
+func landShip(s *ship.Ship, ships []*ship.Ship, planets []*planet.Planet, civilizations []*civilization.Civilization) string {
 	planetname := findPlanetByCoords(s.Endx(), s.Endy(), planets)
-	colonize(s.Civilization(), planetname, planets, civilizations)
-	attack(planetname, planets)
+	if(s.Landed() == false) {
+		colonize(s.Civilization(), planetname, planets, civilizations)
+		attackmessage := attack(planetname, s.Civilization(), planets, civilizations)
+		s.SetLanded(true) 
+		return attackmessage
+	}
+	return ""
 }
 
 func colonize(civilizationname string, planetname string, planets []*planet.Planet, civilizations []*civilization.Civilization) { 
@@ -926,8 +952,43 @@ func advanceColonizing(planets []*planet.Planet) {
 	}
 }
 
-func attack(planetname string, planets []*planet.Planet) {
-	//to be implemented
+func changePlanetOwner(oldowner string, newowner string, planets []*planet.Planet) {
+	for _, p := range planets {
+		if(p.Occupied() == oldowner) {
+			p.SetOccupied(newowner)
+		}
+	}	
+}
+
+func attack(defenderplanetname string, attackername string, planets []*planet.Planet, civilizations []*civilization.Civilization) string {
+	defendername := findPlanetOccupiedByName(defenderplanetname, planets)
+	defenderdef := findCivilizationDEFByName(defendername, civilizations)
+	attackeratk := findCivilizationATKByName(attackername, civilizations)
+	difference := attackeratk - defenderdef
+
+	//attacker gets ATK rolls of 10 sided die and defender gets DEF+1 rolls
+	//attacker gets 2 additional rolls of die with guaranteed 10 if 3 levels above DEF
+	attacksum := 0
+	for i := 0; i < attackeratk; i++ {
+		attacksum = attacksum + random(1, 11)
+	}	
+
+	defendsum := 0
+	for i := 0; i < defenderdef; i++ {
+		defendsum = defendsum + random(1, 11)
+	}
+	defendsum = defendsum + 10
+		
+	if(difference >= 3) {
+		attacksum = attacksum + 10
+	}
+	
+	if(attacksum > defendsum) {
+		changePlanetOwner(defendername, attackername, planets)
+		return fmt.Sprintf("Planet conquered - ATK: %s %d - DEF: %s %d", attackername, attacksum, defendername, defendsum)
+	} else {
+		return fmt.Sprintf("ATK: %s %d - DEF: %s %d", attackername, attacksum, defendername, defendsum)
+	} 
 }	
 
 func distance(fromx int, fromy int, tox int, toy int) float64 {
