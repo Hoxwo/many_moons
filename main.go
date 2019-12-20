@@ -55,7 +55,7 @@ func main() {
 	//c4 := civilization.New("Autocracy",  "blue",    2, 1, 2, 3, 1, 2, 1, 1, 30, 30, 0, 0, 0)
 	//c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)
 	//super powered version of the nations for testing				
-	c0 := civilization.New("Balanced",   "cyan",    5, 5, 5, 5, 5, 5, 5, 1, 3, 0, 20, 10, 1, 2, -1)
+	c0 := civilization.New("Balanced",   "cyan",    8, 5, 5, 5, 5, 5, 5, 1, 3, 0, 20, 10, 1, 2, -1)
 	c1 := civilization.New("Warlike",    "red",     7, 6, 5, 5, 3, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
 	c2 := civilization.New("Defensive",  "magenta", 6, 7, 5, 5, 4, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
 	c3 := civilization.New("Explorer",   "green",   3, 4, 7, 6, 5, 5, 5, 1, 1, 0, 30, 10, 0, 0, 0)
@@ -146,22 +146,22 @@ func main() {
 	messages := widgets.NewList()	
 	if(len(messageHistory) == 0) {		
 		messages.Rows = make([]string,0)
-	} else if(len(messageHistory) < 3) {
+	} else if(len(messageHistory) < 4) {
 		messages.Rows = messageHistory[:len(messageHistory)]
 	} else {
-		messages.Rows = messageHistory[len(messageHistory)-3:len(messageHistory)]
+		messages.Rows = messageHistory[len(messageHistory)-4:len(messageHistory)]
 	}
 	messages.TextStyle = ui.NewStyle(ui.ColorWhite)
 	messages.WrapText = false
 	messages.BorderStyle.Fg = ui.ColorCyan
 	messages.Title = "Messages"
-	messages.SetRect(78, 19, 116, 24)
+	messages.SetRect(78, 19, 116, 25)
 
 	selectplanetinfopane := widgets.NewParagraph()
 	selectplanetinfopane.Title = "Planet Info"
 	selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships, civilizations[0].Name(), civilizations[0].Navigation(), 
 							civilizations[0].Technology())
-	selectplanetinfopane.SetRect(78, 24, 116, 34)
+	selectplanetinfopane.SetRect(78, 25, 116, 34)
 	selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 
 	ui.Render(planetmapframe, planetmap, civstatspane, sliderspane, playercivstatspane, messages, selectplanetinfopane)
@@ -503,22 +503,22 @@ func main() {
 			messages := widgets.NewList()	
 			if(len(messageHistory) == 0) {		
 				messages.Rows = make([]string,0)
-			} else if(len(messageHistory) < 3) {
+			} else if(len(messageHistory) < 4) {
 				messages.Rows = messageHistory[:len(messageHistory)]
 			} else {
-				messages.Rows = messageHistory[len(messageHistory)-3:len(messageHistory)]
+				messages.Rows = messageHistory[len(messageHistory)-4:len(messageHistory)]
 			}
 			messages.TextStyle = ui.NewStyle(ui.ColorWhite)
 			messages.WrapText = false
 			messages.BorderStyle.Fg = ui.ColorCyan
 			messages.Title = "Messages"
-			messages.SetRect(78, 19, 116, 24)
+			messages.SetRect(78, 19, 116, 25)
 
 			selectplanetinfopane := widgets.NewParagraph()
 			selectplanetinfopane.Title = "Planet Info"
 			selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships, civilizations[0].Name(), civilizations[0].Navigation(),
 									civilizations[0].Technology())
-			selectplanetinfopane.SetRect(78, 24, 116, 34)
+			selectplanetinfopane.SetRect(78, 25, 116, 34)
 			selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 			//	
 
@@ -884,6 +884,16 @@ func findPlanetOccupiedByName(searchname string,  planets []*planet.Planet) stri
 	return "ERROR"
 }
 
+func findPlanetColonizingByName(searchname string,  planets []*planet.Planet) bool {
+	for _, p := range planets {
+		if(p.Name() == searchname) {
+			return p.Colonizing()
+		}
+	}
+	
+	return false
+}
+
 func findPlanetByCoords(xcoord int, ycoord int, planets []*planet.Planet) string {
 	for _, p := range planets {
 		if(p.Xcoord() == xcoord && p.Ycoord() == ycoord) {
@@ -983,6 +993,7 @@ func changePlanetOwner(oldowner string, newowner string, planets []*planet.Plane
 }
 
 func attack(defenderplanetname string, attackername string, planets []*planet.Planet, civilizations []*civilization.Civilization) string {
+	if(findPlanetColonizingByName(defenderplanetname, planets) != true && findPlanetOccupiedByName(defenderplanetname, planets) != attackername) {
 	defendername := findPlanetOccupiedByName(defenderplanetname, planets)
 	defenderdef := findCivilizationDEFByName(defendername, civilizations)
 	attackeratk := findCivilizationATKByName(attackername, civilizations)
@@ -1009,10 +1020,12 @@ func attack(defenderplanetname string, attackername string, planets []*planet.Pl
 	
 	if(attacksum > defendsum) {
 		changePlanetOwner(defendername, attackername, planets)
-		return fmt.Sprintf("Conquered - %s: %d - %s: %d", attackername, attacksum, defendername, defendsum)
+		return fmt.Sprintf("Taken: %s: %d - %s: %d", attackername, attacksum, defendername, defendsum)
 	} else {
 		return fmt.Sprintf("%s: %d - %s: %d", attackername, attacksum, defendername, defendsum)
 	} 
+	} 
+	return ""
 }	
 
 func distance(fromx int, fromy int, tox int, toy int) float64 {
