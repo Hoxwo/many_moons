@@ -170,7 +170,8 @@ func main() {
 
 	selectplanetinfopane := widgets.NewParagraph()
 	selectplanetinfopane.Title = "Planet Info"
-	selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships)
+	selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships, civilizations[0].Name(), civilizations[0].Navigation(), 
+							civilizations[0].Technology())
 	selectplanetinfopane.SetRect(78, 24, 116, 34)
 	selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 
@@ -196,13 +197,35 @@ func main() {
 				}
 			case "s":
 				if(civilizations[0].Shipsavailable() > 0) {
-					civilizations[0].SetShipsavailable(civilizations[0].Shipsavailable() - 1)
-					planetfromname := findCivilizationBasePlanetByName(civilizations[0].Name(), planets)
-					newship := sendShip(civilizations[0].Name(), planetfromname, planets[selectedplanet].Name(), planets)
-					ships = append(ships, &newship)
-					messageHistory = append(messageHistory, fmt.Sprintf("Ship sent to %s", planets[selectedplanet].Name()))
-				}
-				
+					distance := int(math.Floor(
+							distance(findPlanetXcoordByName(findCivilizationBasePlanetByName(civilizations[0].Name(), planets), planets),
+							findPlanetYcoordByName(findCivilizationBasePlanetByName(civilizations[0].Name(), planets), planets),
+							findPlanetXcoordByName(planets[selectedplanet].Name(), planets),
+							findPlanetYcoordByName(planets[selectedplanet].Name(), planets))))
+					navdistance := int(math.Floor(float64(distance/5)))
+					tecneeded := 0
+					if(planets[selectedplanet].Planettype() == "Ice Giant") {
+						tecneeded = 4
+					} else if(planets[selectedplanet].Planettype() == "Gas Giant") {
+						tecneeded = 7
+					}
+
+					if(civilizations[0].Navigation() >= navdistance && civilizations[0].Technology() >= tecneeded) {
+						civilizations[0].SetShipsavailable(civilizations[0].Shipsavailable() - 1)
+						planetfromname := findCivilizationBasePlanetByName(civilizations[0].Name(), planets)
+						newship := sendShip(civilizations[0].Name(), planetfromname, planets[selectedplanet].Name(), planets)
+						ships = append(ships, &newship)
+						messageHistory = append(messageHistory, fmt.Sprintf("Ship sent to %s", planets[selectedplanet].Name()))
+					} else if(civilizations[0].Navigation() < navdistance && civilizations[0].Technology() >= tecneeded) {
+						messageHistory = append(messageHistory, fmt.Sprintf("Higher NAV required"))
+					} else if(civilizations[0].Navigation() >= navdistance && civilizations[0].Technology() < tecneeded) {
+						messageHistory = append(messageHistory, fmt.Sprintf("Higher TEC required"))
+					} else {
+						messageHistory = append(messageHistory, fmt.Sprintf("Higher NAV and TEC required"))
+					}
+				} else {
+					messageHistory = append(messageHistory, fmt.Sprintf("No ships available"))
+				}				
 			}
 		case <-ticker:
 			if(tickerCount % 100 == 1) {
@@ -501,7 +524,8 @@ func main() {
 
 			selectplanetinfopane := widgets.NewParagraph()
 			selectplanetinfopane.Title = "Planet Info"
-			selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships)
+			selectplanetinfopane.Text = SelectedPlanetText(planets, selectedplanet, ships, civilizations[0].Name(), civilizations[0].Navigation(),
+									civilizations[0].Technology())
 			selectplanetinfopane.SetRect(78, 24, 116, 34)
 			selectplanetinfopane.BorderStyle.Fg = ui.ColorBlue
 			//	
@@ -613,7 +637,7 @@ func PlayerCivilizationStatsText(civilizations []*civilization.Civilization) str
 	return playercivstatstext
 }
 
-func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*ship.Ship) string {
+func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*ship.Ship, playercivilizationname string, playercivilizationnav int, playercivilizationtec int) string {
 	name := planets[selectedplanet].Name()
 	planettype := planets[selectedplanet].Planettype()
 	occupied := planets[selectedplanet].Occupied()
@@ -626,13 +650,37 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*s
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet occupied by: %s", occupied)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet resource value: %d", resources)
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nPlanet coordinates: (%d,%d)", xcoord, ycoord)
-	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\nDistance from your base planet: 0") //TO DO
+	distance := int(math.Floor(distance(findPlanetXcoordByName(findCivilizationBasePlanetByName(playercivilizationname, planets), planets),
+				findPlanetYcoordByName(findCivilizationBasePlanetByName(playercivilizationname, planets), planets),
+				xcoord,
+				ycoord)))
+	navdistance := int(math.Floor(float64(distance/5)))
 	if(planettype == "Ice Giant") {
-		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: 1](fg:blue) [TEC required: 4](fg:red) ")
+		if(playercivilizationnav >= navdistance && playercivilizationtec >= 4) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:blue) [TEC required: 4](fg:blue)", navdistance )
+		} else if(playercivilizationnav < navdistance && playercivilizationtec >= 4) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:red) [TEC required: 4](fg:blue)", navdistance )
+		} else if(playercivilizationnav >= navdistance && playercivilizationtec < 4) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:blue) [TEC required: 4](fg:red)", navdistance )
+		} else if(playercivilizationnav < navdistance && playercivilizationtec < 4) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:red) [TEC required: 4](fg:red)", navdistance )
+		} 
 	} else if(planettype == "Gas Giant") {
-		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: 1](fg:blue) [TEC required: 7](fg:red)")
+		if(playercivilizationnav >= navdistance && playercivilizationtec >= 7) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:blue) [TEC required: 7](fg:blue)", navdistance )
+		} else if(playercivilizationnav < navdistance && playercivilizationtec >= 7) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:red) [TEC required: 7](fg:blue)", navdistance )
+		} else if(playercivilizationnav >= navdistance && playercivilizationtec < 7) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:blue) [TEC required: 7](fg:red)", navdistance )
+		} else if(playercivilizationnav < navdistance && playercivilizationtec < 7) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:red) [TEC required: 7](fg:red)", navdistance )
+		} 
 	} else {
-		selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: 1](fg:blue)")	
+		if(playercivilizationnav >= navdistance) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:blue) [TEC required: 0](fg:blue)", navdistance )
+		} else if(playercivilizationnav < navdistance) {
+			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:red) [TEC required: 0](fg:blue)", navdistance )
+		}
 	}
 	selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[<, >] scan [s] send ship")
 	return selectedPlanetText
@@ -860,7 +908,7 @@ func landShip(s *ship.Ship, ships []*ship.Ship, planets []*planet.Planet, civili
 
 func colonize(civilizationname string, planetname string, planets []*planet.Planet, civilizations []*civilization.Civilization) { 
 	for i, p := range planets {
-		if(p.Name() == planetname) {
+		if(p.Name() == planetname && p.Occupied() == "") {
 			updatedplanet := planet.New(p.Name(), p.Appearance(),   p.Resources(), civilizationname, p.Planettype(), p.Xcoord(), p.Ycoord(), 							    false, findCivilizationTimeToColonizeByName(civilizationname, civilizations), true)
 			p = &updatedplanet
 			planets[i] = p
@@ -884,3 +932,7 @@ func advanceColonizing(planets []*planet.Planet) {
 func attack(planetname string, planets []*planet.Planet) {
 	//to be implemented
 }	
+
+func distance(fromx int, fromy int, tox int, toy int) float64 {
+	return math.Sqrt(math.Pow(float64(fromx - tox), 2) + math.Pow(float64(fromy - toy), 2))
+}
