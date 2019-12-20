@@ -47,7 +47,7 @@ func main() {
 	planets = GenerateSpace(planets, centerofmapx, centerofmapy)
 
 	// set up civilizations
-	// {name, color, atk, def, nav, gov, tec, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
+	// {name, color, atk, def, nav, gov, tec, base res, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
 	//c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 10, 1, 2, -1)
 	//c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
 	//c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
@@ -55,10 +55,10 @@ func main() {
 	//c4 := civilization.New("Autocracy",  "blue",    2, 1, 2, 3, 1, 2, 1, 1, 30, 30, 0, 0, 0)
 	//c5 := civilization.New("Technology", "yellow",  1, 2, 2, 1, 3, 2, 1, 1, 30, 30, 0, 0, 0)
 	//super powered version of the nations for testing				
-	c0 := civilization.New("Balanced",   "cyan",    5, 5, 5, 5, 5, 5, 1, 3, 0, 20, 10, 1, 2, -1)
-	c1 := civilization.New("Warlike",    "red",     7, 6, 5, 5, 3, 4, 1, 1, 0, 30, 10, 0, 0, 0)
-	c2 := civilization.New("Defensive",  "magenta", 6, 7, 5, 5, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
-	c3 := civilization.New("Explorer",   "green",   3, 4, 7, 6, 5, 5, 1, 1, 0, 30, 10, 0, 0, 0)
+	c0 := civilization.New("Balanced",   "cyan",    5, 5, 5, 5, 5, 5, 5, 1, 3, 0, 20, 10, 1, 2, -1)
+	c1 := civilization.New("Warlike",    "red",     7, 6, 5, 5, 3, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
+	c2 := civilization.New("Defensive",  "magenta", 6, 7, 5, 5, 4, 4, 4, 1, 1, 0, 30, 10, 0, 0, 0)
+	c3 := civilization.New("Explorer",   "green",   3, 4, 7, 6, 5, 5, 5, 1, 1, 0, 30, 10, 0, 0, 0)
 
 
 	//add them to master list
@@ -220,7 +220,7 @@ func main() {
 			if(tickerCount % 100 == 1) {
 				if(tickerCount % 400 == 1) {
 					currentyear = currentyear + 1
-					EveryCivilizationCountdown(civilizations)
+					EveryCivilizationCountdown(civilizations, planets)
 					message := advanceAllShips(ships, planets, civilizations)
 					if(len(message) > 0) {
 						messageHistory = append(messageHistory, message)
@@ -605,7 +605,7 @@ func CurrentYearText(currentyear int) string {
 	return fmt.Sprintf("Current year: %d", currentyear)
 }
 
-func EveryCivilizationCountdown(civilizations []*civilization.Civilization) {
+func EveryCivilizationCountdown(civilizations []*civilization.Civilization, planets []*planet.Planet) {
 	for _, c := range civilizations {
 		if(c.Shiptimer() < c.Maxshiptimer()) { 
 			c.SetShiptimer(c.Shiptimer() + 1)
@@ -614,6 +614,18 @@ func EveryCivilizationCountdown(civilizations []*civilization.Civilization) {
 			if(c.Shipsavailable() < c.Maxshipsavailable()) {
 				c.SetShipsavailable(c.Shipsavailable() + 1)			
 			}
+			
+			resourcesfromplanets := 0			
+			for _, p := range planets {
+				if(p.Occupied() == c.Name()) {
+					resourcesfromplanets = resourcesfromplanets + p.Resources()
+				}	
+			}
+			totalresources := c.Baseresources() + resourcesfromplanets
+			if(totalresources > 9) {
+				totalresources = 9			
+			} 
+			c.SetResources(totalresources)
 		}
 	}
 }
@@ -647,8 +659,8 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*s
 				xcoord,
 				ycoord)))
 	navdistance := int(math.Floor(float64(distance/5)))
-	if(navdistance > 10) {
-		navdistance = 10
+	if(navdistance > 9) {
+		navdistance = 9
 	}
 	if(planettype == "Ice Giant") {
 		if(playercivilizationnav >= navdistance && playercivilizationtec >= 4) {
@@ -809,6 +821,16 @@ func findCivilizationATKByName(searchname string, civilizations []*civilization.
 	}
 	
 	return -7
+} 
+
+func findCivilizationRESByName(searchname string, civilizations []*civilization.Civilization) int {
+	for _, c := range civilizations {
+		if(c.Name() == searchname) {
+			return c.Resources()
+		}
+	}
+
+	return -7
 }
 
 func findCivilizationTimeToColonizeByName(searchname string, civilizations []*civilization.Civilization) int {
@@ -968,10 +990,12 @@ func attack(defenderplanetname string, attackername string, planets []*planet.Pl
 
 	//attacker gets ATK rolls of 10 sided die and defender gets DEF+1 rolls
 	//attacker gets 2 additional rolls of die with guaranteed 10 if 3 levels above DEF
+	//attacker has their resource value added
 	attacksum := 0
 	for i := 0; i < attackeratk; i++ {
 		attacksum = attacksum + random(1, 11)
 	}	
+	attacksum = attacksum + findCivilizationRESByName(attackername, civilizations)
 
 	defendsum := 0
 	for i := 0; i < defenderdef; i++ {
@@ -985,9 +1009,9 @@ func attack(defenderplanetname string, attackername string, planets []*planet.Pl
 	
 	if(attacksum > defendsum) {
 		changePlanetOwner(defendername, attackername, planets)
-		return fmt.Sprintf("Planet conquered - ATK: %s %d - DEF: %s %d", attackername, attacksum, defendername, defendsum)
+		return fmt.Sprintf("Conquered - %s: %d - %s: %d", attackername, attacksum, defendername, defendsum)
 	} else {
-		return fmt.Sprintf("ATK: %s %d - DEF: %s %d", attackername, attacksum, defendername, defendsum)
+		return fmt.Sprintf("%s: %d - %s: %d", attackername, attacksum, defendername, defendsum)
 	} 
 }	
 

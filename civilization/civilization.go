@@ -8,6 +8,7 @@ type Civilization struct {
     navigation int
     government int
     technology int
+    baseresources int
     resources int
     shipsavailable int 
     maxshipsavailable int // (base value 1 + (1 for tech level 4, 2 for tech level 7, 3 for tech level 10) start phase with these ships available 
@@ -19,8 +20,8 @@ type Civilization struct {
     envindslider int // -2, -1, 0, 1, 2
 }
 
-func New(civilization string, color string, attack int, defense int, navigation int, government int, technology int, resources int, shipsavailable int, maxshipsavailable int, shiptimer int, maxshiptimer int, colonizationtime int, atkdefslider int, autdemslider int, envindslider int) Civilization {
-    c := Civilization {civilization, color, attack, defense, navigation, government, technology, resources, shipsavailable, maxshipsavailable, shiptimer, maxshiptimer, colonizationtime, atkdefslider, autdemslider, envindslider}
+func New(civilization string, color string, attack int, defense int, navigation int, government int, technology int, baseresources int, resources int, shipsavailable int, maxshipsavailable int, shiptimer int, maxshiptimer int, colonizationtime int, atkdefslider int, autdemslider int, envindslider int) Civilization {
+    c := Civilization {civilization, color, attack, defense, navigation, government, technology, baseresources, resources, shipsavailable, maxshipsavailable, shiptimer, maxshiptimer, colonizationtime, atkdefslider, autdemslider, envindslider}
     return c
 }
 
@@ -78,6 +79,14 @@ func (c *Civilization) SetTechnology(technology int) {
 
 func (c Civilization) Technology() int {
     return c.technology
+}
+
+func (c *Civilization) SetBaseresources(baseresources int) {
+    c.baseresources = baseresources
+}
+
+func (c Civilization) Baseresources() int {
+    return c.baseresources
 }
 
 func (c *Civilization) SetResources(resources int) {
