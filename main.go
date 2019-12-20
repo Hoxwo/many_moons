@@ -33,10 +33,6 @@ func main() {
 	//array of messages
 	messageHistory := make([]string,0)
 	//save message
-		//if(strings.Compare(message,"") != 0) {
-//				messageHistory = append(messageHistory, message)
-//		}
-
 
 	//All colors
 	//termui.ColorCyan
@@ -69,20 +65,13 @@ func main() {
 	civilizations = append(civilizations, &c0, &c1, &c2, &c3) //&c4, &c5)	
 
 	//set a home planet for each civ
-	usedplanets := make([]int, 0)
-	for _, c := range civilizations {
-		planetnumber := 0
-		for planetnumber == 0 || contains(usedplanets, planetnumber) {
-			planetnumber = random(1,16)
-			if(contains(usedplanets, planetnumber) == false) {
-				usedplanets = append(usedplanets, planetnumber)
-				homeplanet := true
-				planets[planetnumber].SetHomeplanet(homeplanet)
-				planets[planetnumber].SetOccupied(c.Name())
-				break
-			}		
+	civnumber :=0
+	for _, p := range planets {
+		if(p.Planettype() == "Small Terrestrial" && civnumber < 4) {
+			p.SetHomeplanet(true)
+			p.SetOccupied(civilizations[civnumber].Name())
+			civnumber++
 		}
-		
 	}
 
 	if err := ui.Init(); err != nil {
@@ -655,6 +644,9 @@ func SelectedPlanetText(planets []*planet.Planet, selectedplanet int, ships []*s
 				xcoord,
 				ycoord)))
 	navdistance := int(math.Floor(float64(distance/5)))
+	if(navdistance > 10) {
+		navdistance = 10
+	}
 	if(planettype == "Ice Giant") {
 		if(playercivilizationnav >= navdistance && playercivilizationtec >= 4) {
 			selectedPlanetText = selectedPlanetText + fmt.Sprintf("\n[NAV required: %d](fg:blue) [TEC required: 4](fg:blue)", navdistance )
@@ -691,7 +683,12 @@ func GenerateSpace(planets []*planet.Planet, centerofmapx int, centerofmapy int)
 	xcoordsused := make([]int, 0)
 	ycoordsused := make([]int, 0) 
 	for i := 0;  i <= numberplanets; i++ {
-		planettype := random(1,5) // 1 - small rocky planet, 2 - large rocky planet, 3 - ice giant, 4 - gas giant
+		// 1 - small rocky planet, 2 - large rocky planet, 3 - ice giant, 4 - gas giant
+		planettype := random(1,5)
+		//first 5 planets are small terrestrial		
+		if(i < 5) {
+			planettype = 1
+		}
 		
 		//don't duplicate any coordinates
 		xcoord := 0
