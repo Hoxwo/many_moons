@@ -48,7 +48,7 @@ func main() {
 
 	// set up civilizations
 	// {name, color, atk, def, nav, gov, tec, base res, res, shipsavail, maxshipsavail, shiptimer, maxshiptimer, colonizationtime, adsli, ademsli, eisli}
-	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 10, 1, 2, -1)
+	c0 := civilization.New("Balanced",   "cyan",    2, 2, 2, 2, 2, 2, 2, 0, 1, 0, 30, 10, 0, 0, 1)
 	c1 := civilization.New("Warlike",    "red",     3, 2, 2, 2, 1, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
 	c2 := civilization.New("Defensive",  "magenta", 2, 3, 2, 2, 1, 1, 1, 1, 1, 0, 30, 10, 0, 0, 0)
 	c3 := civilization.New("Explorer",   "green",   1, 1, 3, 2, 2, 2, 2, 1, 1, 0, 30, 10, 0, 0, 0)
@@ -183,6 +183,30 @@ func main() {
 			case ".":
 				if(selectedplanet < 15) {
 					selectedplanet++
+				}
+			case "t":
+				if(civilizations[0].Atkdefslider() > -2) {
+					civilizations[0].SetAtkdefslider(civilizations[0].Atkdefslider()-1)
+				}
+			case "y":
+				if(civilizations[0].Atkdefslider() < 2) {
+					civilizations[0].SetAtkdefslider(civilizations[0].Atkdefslider()+1)
+				}
+			case "g":
+				if(civilizations[0].Autdemslider() > -2) {
+					civilizations[0].SetAutdemslider(civilizations[0].Autdemslider()-1)
+				}
+			case "h":
+				if(civilizations[0].Autdemslider() < 2) {
+					civilizations[0].SetAutdemslider(civilizations[0].Autdemslider()+1)
+				}
+			case "b":
+				if(civilizations[0].Envindslider() > -2) {
+					civilizations[0].SetEnvindslider(civilizations[0].Envindslider()-1)
+				}
+			case "n":
+				if(civilizations[0].Envindslider() < 2) {
+					civilizations[0].SetEnvindslider(civilizations[0].Envindslider()+1)
 				}
 			case "s":
 				if(civilizations[0].Shipsavailable() > 0) {
@@ -587,15 +611,15 @@ func SliderValueToString(slidervalue int) string {
 
 func SliderValueToMessage(slidervalue int, firsttrait string, secondtrait string) string {
 	if(slidervalue == -2) {
-        	return fmt.Sprintf("[+2 to %s](fg:blue) [-2 to %s](fg:red)", firsttrait, secondtrait)  	
+        	return fmt.Sprintf("[+2 to %s](fg:blue) [-1 to %s](fg:red)", firsttrait, secondtrait)  	
 	} else if(slidervalue == -1) {
-        	return fmt.Sprintf("[+1 to %s](fg:blue) [-1 to %s](fg:red)", firsttrait, secondtrait)	
+        	return fmt.Sprintf("[+1 to %s](fg:blue) [+0 to %s](fg:white)", firsttrait, secondtrait)	
 	} else if(slidervalue == 0) {
         	return fmt.Sprintf("[+0 to %s](fg:white) [+0 to %s](fg:white)", firsttrait, secondtrait)	
 	} else if(slidervalue == 1) {
-        	return fmt.Sprintf("[-1 to %s](fg:red) [+1 to %s](fg:blue)", firsttrait, secondtrait)
+        	return fmt.Sprintf("[+0 to %s](fg:white) [+1 to %s](fg:blue)", firsttrait, secondtrait)
 	} else if(slidervalue == 2) {
-        	return fmt.Sprintf("[-2 to %s](fg:red) [+2 to %s](fg:blue)", firsttrait, secondtrait)	
+        	return fmt.Sprintf("[-1 to %s](fg:red) [+2 to %s](fg:blue)", firsttrait, secondtrait)	
 	} else {
 		return "ERROR"
 	}
