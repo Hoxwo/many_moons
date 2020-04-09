@@ -250,6 +250,10 @@ func main() {
 						messageHistory = append(messageHistory, message)
 					}
 					advanceColonizing(planets)
+					//every 100 years, adjust stats based on sliders
+					if(currentyear % 100 == 0) {
+						updateEveryCivilizationStats(civilizations)
+					}
 				}
 			
 			//render map and stat panes
@@ -631,6 +635,7 @@ func CurrentYearText(currentyear int) string {
 
 func EveryCivilizationCountdown(civilizations []*civilization.Civilization, planets []*planet.Planet) {
 	for _, c := range civilizations {
+		//handle ship timers
 		if(c.Shiptimer() < c.Maxshiptimer()) { 
 			c.SetShiptimer(c.Shiptimer() + 1)
 		} else {
@@ -638,19 +643,21 @@ func EveryCivilizationCountdown(civilizations []*civilization.Civilization, plan
 			if(c.Shipsavailable() < c.Maxshipsavailable()) {
 				c.SetShipsavailable(c.Shipsavailable() + 1)			
 			}
-			
-			resourcesfromplanets := 0			
-			for _, p := range planets {
-				if(p.Occupied() == c.Name()) {
-					resourcesfromplanets = resourcesfromplanets + p.Resources()
-				}	
-			}
-			totalresources := c.Baseresources() + resourcesfromplanets
-			if(totalresources > 9) {
-				totalresources = 9			
-			} 
-			c.SetResources(totalresources)
 		}
+		
+		//handle resource adjustments
+		resourcesfromplanets := 0			
+		for _, p := range planets {
+			if(p.Occupied() == c.Name()) {
+				resourcesfromplanets = resourcesfromplanets + p.Resources()
+			}	
+		}
+
+		totalresources := c.Baseresources() + resourcesfromplanets		
+		if(totalresources > 9) {
+			totalresources = 9			
+		} 
+		c.SetResources(totalresources)
 	}
 }
 
@@ -960,6 +967,101 @@ func advanceAllShips(ships []*ship.Ship, planets []*planet.Planet, civilizations
 		}
 	}
 	return ""
+}
+
+func updateEveryCivilizationStats(civilizations []*civilization.Civilization) {
+	for _, c := range civilizations {
+		atkdef := c.Atkdefslider() 
+		autdem := c.Autdemslider() 
+		envind := c.Envindslider() 
+		if(atkdef != 0) {
+			if(atkdef == -2) {
+				if(c.Attack() > 0) {
+					c.SetAttack(c.Attack() - 1)
+				}
+				if(c.Defense() == 8) {
+					c.SetDefense(c.Defense() + 1)
+				} else if(c.Defense() < 8) {
+					c.SetDefense(c.Defense() + 2)
+				}							
+			} else if(atkdef == -1) {
+				if(c.Defense() < 9) {
+					c.SetDefense(c.Defense() + 1)
+				}	
+			} else if(atkdef == 1) {
+				if(c.Attack() < 9) {
+					c.SetAttack(c.Attack() + 1)
+				}	
+			} else if(atkdef == 2) {
+				if(c.Attack() == 8) {
+					c.SetAttack(c.Attack() + 1)
+				} else if(c.Attack() < 8) {
+					c.SetAttack(c.Attack() + 2)
+				}
+				if(c.Defense() > 0) {
+					c.SetDefense(c.Defense() - 1)
+				}	
+			}
+		}
+		if(autdem != 0) {
+			if(autdem == -2) {
+				if(c.Navigation() > 0) {
+					c.SetNavigation(c.Navigation() - 1)
+				}
+				if(c.Government() == 8)	{
+					c.SetGovernment(c.Government() + 1)
+				} else if(c.Government() < 8) {
+					c.SetGovernment(c.Government() + 2)	
+				}	
+			} else if(autdem == -1) {
+				if(c.Government() < 9) {
+					c.SetGovernment(c.Government() + 1)
+				}		
+			} else if(autdem == 1) {
+				if(c.Navigation() < 9) {
+					c.SetNavigation(c.Navigation() + 1)
+				}	
+			} else if(autdem == 2) {
+				if(c.Navigation() == 8) {
+					c.SetNavigation(c.Navigation() + 1)
+				} else if(c.Navigation() < 8) {
+					c.SetNavigation(c.Navigation() + 2)
+				}
+				if(c.Government() > 0) {
+					c.SetGovernment(c.Government() - 1)
+				}
+			}
+		}
+		if(envind != 0) {
+			if(envind == -2) {
+				if(c.Technology() > 0) {
+					c.SetTechnology(c.Technology() - 1)
+				}
+				if(c.Baseresources() == 8) {
+					c.SetBaseresources(c.Baseresources() + 1)
+				} else if(c.Baseresources() < 8) {
+					c.SetBaseresources(c.Baseresources() + 2)
+				}			
+			} else if(envind == -1) {
+				if(c.Baseresources() < 9) {
+					c.SetBaseresources(c.Baseresources() + 1)
+				}
+			} else if(envind == 1) {
+				if(c.Technology() < 9) {
+					c.SetTechnology(c.Technology() + 1)
+				}
+			} else if(envind == 2) {
+				if(c.Technology() == 8) {
+					c.SetTechnology(c.Technology() + 1)
+				} else if(c.Technology() < 8) {
+					c.SetTechnology(c.Technology() + 2)
+				}
+				if(c.Baseresources() > 0) {
+					c.SetBaseresources(c.Baseresources() -1)
+				}
+			}
+		}
+	} 
 }
 
 func willShipAdvance(speed int) bool {
